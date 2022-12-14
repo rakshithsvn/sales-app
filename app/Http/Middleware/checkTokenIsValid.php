@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\EventUser;
 use App\Models\LinkUser;
 use Carbon\Carbon;
 
@@ -28,7 +29,7 @@ class checkTokenIsValid
         ], 401);
 
         $token = $request->bearerToken() ? $request->bearerToken() : $request->input('token');
-        $id = $request->input('id');
+        // $id = $request->input('id');
 
         if(!$token) {
             return $errorResponse;
@@ -36,12 +37,16 @@ class checkTokenIsValid
 
         $tokenSplit = explode('_', $token);
 
-        if(count($tokenSplit) !== 2 || $id !== $tokenSplit[1]) {
+        if(count($tokenSplit) !== 2 ) {
             return $errorResponse;
         }
 
-        $accessToken = LinkUser::whereRaw("BINARY `access_token`= ?",[$token])->where('event_id', $tokenSplit[1])->first();
+        $user = EventUser::where('is_verified', 1)->find($tokenSplit[1]);
+        if(!$user) {
+            return $errorResponse;
+        }
 
+        $accessToken = LinkUser::whereRaw("BINARY `access_token`= ?",[$token])->where('event_user_id', $tokenSplit[1])->first();
         if(!$accessToken) {
             return $errorResponse;
         }

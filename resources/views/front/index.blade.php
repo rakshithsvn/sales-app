@@ -485,7 +485,7 @@
                 <div class="content-column col-lg-6 col-md-12 col-sm-12">
                     <div class="inner-column">
                         <div class="sec-title">
-                            <span class="sub-title">WELCOME TO FANTASIA ENTERTAINMENT</span>
+                            <span class="sub-title">WELCOME TO Sales App</span>
                             <h2>Unique Experiences is what we do.... be it through dance, video, special effects or any other artform....</h2>
                             <span class="divider"></span>
                         </div>

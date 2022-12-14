@@ -121,7 +121,7 @@ class APIController extends Controller
     {
         $eventLogin = LinkUser::where('event_user_id', $userId)->first();
 
-        $token = bin2hex(random_bytes(64)) . '_' . @$eventId;
+        $token = bin2hex(random_bytes(64)) . '_' . @$userId;
 
         $eventLogin->forceFill([
             'access_token' => $token,
@@ -173,7 +173,7 @@ class APIController extends Controller
     public function getUsers()
     {
         $result = [];
-        $users = EventUser::whereNotNull('email')->get();
+        $users = EventUser::where('is_verified', 1)->whereNotNull('email')->get();
 
         foreach ($users as $key => $user) {
             $result[$key]['user_id'] = $user->id;
@@ -198,7 +198,7 @@ class APIController extends Controller
             $result[$key]['min_purchase_qty'] = $product->min_purchase_qty;
             $result[$key]['price'] = $product->price;
             $result[$key]['reward_points'] = $product->reward_points;
-            $result[$key]['product_img'] = 'https://sales-app.com/' . $product->image;
+            $result[$key]['product_img'] = 'http://appsalesjp.digitalskyonline.com/' . $product->image;
         }
 
         return response()->json($result, 200);
@@ -235,7 +235,7 @@ class APIController extends Controller
             $result[$key]['product_name'] = $product->name;
             $result[$key]['qty'] = $purchase->quantity;
             $result[$key]['dealer_name'] = $dealer->name;
-            $result[$key]['invoice_url'] = 'https://sales-app.com/' . $purchase->invoice_url;
+            $result[$key]['invoice_url'] = 'http://appsalesjp.digitalskyonline.com/' . $purchase->invoice_url;
         }
 
         return response()->json($result, 200);
@@ -292,7 +292,7 @@ class APIController extends Controller
                     'min_purchase_qty' => $product->min_purchase_qty,
                     'price' => $product->price,
                     'reward_points' => $product->reward_points,
-                    'product_img' => 'https://sales-app.com/' . $product->image,
+                    'product_img' => 'http://appsalesjp.digitalskyonline.com/' . $product->image,
                 ]
             ];
 
@@ -335,14 +335,14 @@ class APIController extends Controller
     {
         $request->replace(['user_id' => $request->user_id, 'product_id' => $request->product_id, 'dealer_id' => $request->dealer_id, 'quantity' => $request->quantity, 'invoice_url' => $request->invoice_url]);
 
-        $res = DB::table('user_purchases')->insert($request->all());
+        $res = DB::table('user_purchases')->insertGetId($request->all());
 
         if ($res) {
-            $purchase = DB::table('user_purchases')->latest()->first();
+            $purchase = DB::table('user_purchases')->find($res);
             $product = DB::table('products')->find($purchase->product_id);
-            $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id)->get();
+            $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id)->first();
             $total_reward = ($reward->user_reward * $purchase->quantity) + $product->reward_points;
-            $reward->insert('user_reward', $total_reward);
+            $reward->save('user_reward', $total_reward);
 
             $result = [
                 'message' => 'Purchase added Successfully',
@@ -396,7 +396,7 @@ class APIController extends Controller
         // $upload->save();
 
         return response()->json([
-            'file_url' => 'https://fantasiadev.digitalskyonline.com/storage/files/uploads/' . @$filename
+            'file_url' => 'http://appsalesjp.digitalskyonline.com/storage/files/uploads/' . @$filename
         ]);
     }
 
@@ -420,7 +420,7 @@ class APIController extends Controller
             $event_tabs = EventTab::where('event_id', '=', @$event->id)->get();
             $res[$key]['id'] = $event->id;
             $res[$key]['name'] = $event->name;
-            $res[$key]['image'] = 'https://fantasiadev.digitalskyonline.com/' . $event->image;
+            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $event->image;
             $res[$key]['event_date'] = $event->event_from_date->format('d') . '-' . $event->event_to_date->format('d M, Y');
         }
 
@@ -436,7 +436,7 @@ class APIController extends Controller
             $user_info = EventUser::where('id', '=', @$user->event_user_id)->first();
             $res[$key]['user_id'] = $user_info->id;
             $res[$key]['user_name'] = $user_info->user_email;
-            $res[$key]['profile_img'] = 'https://fantasiadev.digitalskyonline.com/' . $user_info->image;
+            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $user_info->image;
             $res[$key]['last_active'] = $user_info->last_active;
         }
 
@@ -450,14 +450,14 @@ class APIController extends Controller
         $event_detail = Event::select('body1 as event_info', 'helpdesk_no', 'address', 'map', 'qr_code', 'p1_number', 'p2_number', 'p3_number', 'p4_number')->where('id', $request->id)->first();
 
         $res['about'] = $event_about;
-        $res['about']['image'] = 'https://fantasiadev.digitalskyonline.com/' . $event_about->image;
+        $res['about']['image'] = 'http://appsalesjp.digitalskyonline.com/' . $event_about->image;
         $res['about']['welcome_page'] = removeExtraChar(strip_tags($event_about->welcome_page));
-        $res['about']['video_path'] = 'https://fantasiadev.digitalskyonline.com/' . $event_about->video_path;
+        $res['about']['video_path'] = 'http://appsalesjp.digitalskyonline.com/' . $event_about->video_path;
         $res['event'] = $event_detail;
         $event_info = strip_tags($event_detail->event_info);
         $res['event']['event_info'] = removeExtraChar(explode("\r\n\r\n", $event_info));
         $res['event']['address'] = removeExtraChar(strip_tags($event_detail->address));
-        $res['event']['qr_code'] = 'https://fantasiadev.digitalskyonline.com/' . $event_detail->qr_code;
+        $res['event']['qr_code'] = 'http://appsalesjp.digitalskyonline.com/' . $event_detail->qr_code;
         $res['event']['h_title'] = "DO'S & DON'TS";
         $res['event']['h_number'] = "SOME IMPORTANT NUMBERS";
         $res['event']['p1_title'] = "WhatsApp Hotline";
@@ -503,7 +503,7 @@ class APIController extends Controller
         $res = @$speakers;
         foreach ($speakers as $key => $speaker) {
             $res[$key]['about'] = removeExtraChar(strip_tags($speaker->about));
-            $res[$key]['image'] = 'https://fantasiadev.digitalskyonline.com/' . $speaker->image;
+            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $speaker->image;
         }
 
         return response()->json($res, 200);
@@ -531,7 +531,7 @@ class APIController extends Controller
         $res1 = @$event_lists;
         foreach ($speakers as $key => $speaker) {
             $res[$key]['about'] = removeExtraChar(strip_tags($speaker->about));
-            $res[$key]['image'] = 'https://fantasiadev.digitalskyonline.com/' . $speaker->image;
+            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $speaker->image;
             foreach ($event_lists as $key1 => $event_list) {
                 $res[$key1]['event_date'] = Carbon::createFromFormat('d/m/Y', $event_list->event_date)->format('M d l');
                 $res[$key1]['event_time'] = $event_list->tab_time;
@@ -553,7 +553,7 @@ class APIController extends Controller
             // $res = @$speaker;    
             $res['name'] = removeExtraChar(strip_tags(@$speaker->name));
             $res['about'] = removeExtraChar(strip_tags(@$speaker->about));
-            $res['image'] = 'https://fantasiadev.digitalskyonline.com/' . @$speaker->image;
+            $res['image'] = 'http://appsalesjp.digitalskyonline.com/' . @$speaker->image;
             $res['social_media'] = [
                 "facebook" => @$speaker->facebook,
                 "twitter" => @$speaker->twitter,
@@ -607,7 +607,7 @@ class APIController extends Controller
 
         $res = $events;
         foreach ($events as $key => $event) {
-            $res[$key]['video_path'] = 'https://fantasiadev.digitalskyonline.com/' . $event->video_path;
+            $res[$key]['video_path'] = 'http://appsalesjp.digitalskyonline.com/' . $event->video_path;
             $res[$key]['location'] = removeExtraChar($event->location);
             $res[$key]['event_date'] = $event->event_from_date->format('d') . '-' . $event->event_to_date->format('d M, Y');
         }
@@ -668,7 +668,7 @@ class APIController extends Controller
         foreach ($query as $key => $chat) {
             $res[$key]['to_user_id'] = $chat->to_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'https://fantasiadev.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_at;
             $res[$key]['last_message'] = $chat->message;
         }
@@ -693,7 +693,7 @@ class APIController extends Controller
             $res[$key]['from_user_id'] = $chat->from_user_id;
             $res[$key]['to_user_id'] = $chat->to_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'https://fantasiadev.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_at;
             $res[$key]['last_message'] = $chat->message;
         }
@@ -710,7 +710,7 @@ class APIController extends Controller
         foreach ($query as $key => $chat) {
             $res[$key]['user_id'] = $chat->from_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'https://fantasiadev.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_date . '-' . $chat->created_time;
             $res[$key]['last_message'] = $chat->message;
         }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>FANTASIA</title>
+<title>SalesApp</title>
 <!-- Stylesheets -->
 <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
 <link href="/assets/plugins/revolution/css/settings.css" rel="stylesheet" type="text/css"><!-- REVOLUTION SETTINGS STYLES -->
@@ -184,7 +184,7 @@
                 <ul class="contact-list-one">
                     <li><i class="flaticon-location"></i> 203 Madison Ave, NY, USA <strong>Address</strong></li>
                     <li><i class="flaticon-alarm-clock-1"></i>Monday - Friday 9am - 6pm <strong>Timing</strong></li>
-                    <li><i class="flaticon-email-1"></i> <a href="mailto:info@fantasia.com">info@fantasia.com</a> <strong>Mail to us</strong></li>
+                    <li><i class="flaticon-email-1"></i> <a href="mailto:info@salesapp.com">info@salesapp.com</a> <strong>Mail to us</strong></li>
                 </ul>
 
                 <ul class="social-links">
@@ -246,7 +246,7 @@
             <ul class="contact-list-one">
                 <li><i class="flaticon-location"></i> 203 Madison Ave, NY, USA <strong>Address</strong></li>
                 <li><i class="flaticon-alarm-clock-1"></i>Monday - Friday 9am - 6pm <strong>Timing</strong></li>
-                <li><i class="flaticon-email-1"></i> <a href="mailto:info@fantasia.com">info@fantasia.com</a> <strong>Mail to us</strong></li>
+                <li><i class="flaticon-email-1"></i> <a href="mailto:info@salesapp.com">info@salesapp.com</a> <strong>Mail to us</strong></li>
             </ul>
         </div>
     </section>
@@ -274,7 +274,7 @@
                 <ul class="contact-list-one">
                     <li><i class="flaticon-location"></i> 203 Madison Ave, NY, USA <strong>Address</strong></li>
                     <li><i class="flaticon-alarm-clock-1"></i>Monday - Friday 9am - 6pm <strong>Timing</strong></li>
-                    <li><i class="flaticon-email-1"></i> <a href="mailto:info@fantasia.com">info@fantasia.com</a> <strong>Mail to us</strong></li>
+                    <li><i class="flaticon-email-1"></i> <a href="mailto:info@salesapp.com">info@salesapp.com</a> <strong>Mail to us</strong></li>
                 </ul>
             </div>
         </div>

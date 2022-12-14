@@ -25,18 +25,19 @@ Route::prefix('api/v1')->group(function () {
     Route::post('auth', [APIController::class, 'login'])->name('auth');
 
     Route::get('getUsers', [APIController::class, 'getUsers'])->name('getUsers');
-    Route::get('getProducts', [APIController::class, 'getProducts'])->name('getProducts');
-    Route::get('getDealers', [APIController::class, 'getDealers'])->name('getDealers');
-    Route::get('getHelpMessages', [APIController::class, 'getHelpMessages'])->name('getHelpMessages');
-    Route::get('getPurchaseList', [APIController::class, 'getPurchaseList'])->name('getPurchaseList');
-    Route::get('getRewardPoints', [APIController::class, 'getRewardPoints'])->name('getRewardPoints');
+    Route::middleware('verifyToken')->get('getProducts', [APIController::class, 'getProducts'])->name('getProducts');
+    Route::middleware('verifyToken')->get('getDealers', [APIController::class, 'getDealers'])->name('getDealers');
+    Route::middleware('verifyToken')->get('getHelpMessages', [APIController::class, 'getHelpMessages'])->name('getHelpMessages');
+    Route::middleware('verifyToken')->get('getPurchaseList', [APIController::class, 'getPurchaseList'])->name('getPurchaseList');
+    Route::middleware('verifyToken')->get('getRewardPoints', [APIController::class, 'getRewardPoints'])->name('getRewardPoints');
   
-    Route::post('postAddDealer', [APIController::class, 'postAddDealer'])->name('postAddDealer');
-    Route::post('postAddProduct', [APIController::class, 'postAddProduct'])->name('postAddProduct');
-    Route::post('addPurchaseEntry', [APIController::class, 'addPurchaseEntry'])->name('addPurchaseEntry');
-    Route::post('claimRewards', [APIController::class, 'claimRewards'])->name('claimRewards');
+    Route::middleware('verifyToken')->post('postAddDealer', [APIController::class, 'postAddDealer'])->name('postAddDealer');
+    Route::middleware('verifyToken')->post('postAddProduct', [APIController::class, 'postAddProduct'])->name('postAddProduct');
+    Route::middleware('verifyToken')->post('addPurchaseEntry', [APIController::class, 'addPurchaseEntry'])->name('addPurchaseEntry');
+    Route::middleware('verifyToken')->post('claimRewards', [APIController::class, 'claimRewards'])->name('claimRewards');
 
-    Route::post('uploadMedia', [APIController::class, 'uploadMedia'])->name('uploadMedia');
+    Route::middleware('verifyToken')->post('uploadMedia', [APIController::class, 'uploadMedia'])->name('uploadMedia');
+
 
 
     Route::post('postMessage', [APIController::class, 'postMessage'])->name('postMessage');
