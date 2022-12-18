@@ -18,6 +18,7 @@ class VerifyCsrfToken extends Middleware
         'api/v1/postAddDealer',
         'api/v1/postAddProduct',
         'api/v1/addPurchaseEntry',
-        'api/v1/claimRewards'
+        'api/v1/uploadMedia',
+        'api/v1/claimRewards',
     ];
 }

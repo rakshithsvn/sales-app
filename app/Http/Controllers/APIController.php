@@ -68,7 +68,7 @@ class APIController extends Controller
             'data' => [
                 'token' => $this->generateEventLoginToken($user->id, 1),
                 'user_details' => [
-                    'isAccountActive' => $user->is_verified,
+                    'isAccountActive' => $user->is_verified ? true : false,
                     'user_id' => $user->id,
                     'user_name' => $user->name,
                     'user_email' => $user->email,
@@ -187,6 +187,33 @@ class APIController extends Controller
         return response()->json($result, 200);
     }
 
+    public function getUserDetail(Request $request)
+    {
+        $result = [];
+        $user = EventUser::where('is_verified', 1)->whereNotNull('email')->find($request->user_id);
+
+        $result = [
+            'message' => 'User data fetched Successfully',
+            'data' => [
+                'refreshed_token' => $this->generateEventLoginToken($user->id, 1),
+                'user_details' => [
+                    'isAccountActive' => true,
+                    'user_id' => $user->id,
+                    'user_name' => $user->name,
+                    'user_email' => $user->email,
+                    'mob_number' => $user->mobile_number,
+                    'street_address' => $user->address,
+                    'state' => $user->state,
+                    'district' => $user->district,
+                    'pin' => $user->pin_code,
+                    'lab_name' => $user->lab_name
+                ]
+            ]
+        ];
+
+        return response()->json([$result], 200);
+    }
+
     public function getProducts()
     {
         $result = [];
@@ -198,7 +225,7 @@ class APIController extends Controller
             $result[$key]['min_purchase_qty'] = $product->min_purchase_qty;
             $result[$key]['price'] = $product->price;
             $result[$key]['reward_points'] = $product->reward_points;
-            $result[$key]['product_img'] = 'http://appsalesjp.digitalskyonline.com/' . $product->image;
+            $result[$key]['product_img'] = 'https://jpsalesapp.technixserv.com/' . $product->image;
         }
 
         return response()->json($result, 200);
@@ -235,7 +262,7 @@ class APIController extends Controller
             $result[$key]['product_name'] = $product->name;
             $result[$key]['qty'] = $purchase->quantity;
             $result[$key]['dealer_name'] = $dealer->name;
-            $result[$key]['invoice_url'] = 'http://appsalesjp.digitalskyonline.com/' . $purchase->invoice_url;
+            $result[$key]['invoice_url'] = 'https://jpsalesapp.technixserv.com/' . $purchase->invoice_url;
         }
 
         return response()->json($result, 200);
@@ -292,7 +319,7 @@ class APIController extends Controller
                     'min_purchase_qty' => $product->min_purchase_qty,
                     'price' => $product->price,
                     'reward_points' => $product->reward_points,
-                    'product_img' => 'http://appsalesjp.digitalskyonline.com/' . $product->image,
+                    'product_img' => 'https://jpsalesapp.technixserv.com/' . $product->image,
                 ]
             ];
 
@@ -363,17 +390,17 @@ class APIController extends Controller
     {
 
         $reward = DB::table('user_rewards')->where('user_id', $request->user_id)->get();
-        $pending_reward = $reward->user_reward-$request->total_rewards;
+        $pending_reward = $reward->user_reward - $request->total_rewards;
 
         $reward->insert('user_reward', $pending_reward);
 
-            $result = [
-                'message' => 'Reward Claimed Successfully',
-                'data' => [
-                    'claimed_reward' => $request->total_rewards,
-                    'pending_reward' => $pending_reward
-                ]
-            ];
+        $result = [
+            'message' => 'Reward Claimed Successfully',
+            'data' => [
+                'claimed_reward' => $request->total_rewards,
+                'pending_reward' => $pending_reward
+            ]
+        ];
 
         return response()->json([$result], 200);
     }
@@ -396,7 +423,7 @@ class APIController extends Controller
         // $upload->save();
 
         return response()->json([
-            'file_url' => 'http://appsalesjp.digitalskyonline.com/storage/files/uploads/' . @$filename
+            'file_url' => 'https://jpsalesapp.technixserv.com/storage/files/uploads/' . @$filename
         ]);
     }
 
@@ -420,7 +447,7 @@ class APIController extends Controller
             $event_tabs = EventTab::where('event_id', '=', @$event->id)->get();
             $res[$key]['id'] = $event->id;
             $res[$key]['name'] = $event->name;
-            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $event->image;
+            $res[$key]['image'] = 'https://jpsalesapp.technixserv.com/' . $event->image;
             $res[$key]['event_date'] = $event->event_from_date->format('d') . '-' . $event->event_to_date->format('d M, Y');
         }
 
@@ -436,7 +463,7 @@ class APIController extends Controller
             $user_info = EventUser::where('id', '=', @$user->event_user_id)->first();
             $res[$key]['user_id'] = $user_info->id;
             $res[$key]['user_name'] = $user_info->user_email;
-            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $user_info->image;
+            $res[$key]['profile_img'] = 'https://jpsalesapp.technixserv.com/' . $user_info->image;
             $res[$key]['last_active'] = $user_info->last_active;
         }
 
@@ -450,14 +477,14 @@ class APIController extends Controller
         $event_detail = Event::select('body1 as event_info', 'helpdesk_no', 'address', 'map', 'qr_code', 'p1_number', 'p2_number', 'p3_number', 'p4_number')->where('id', $request->id)->first();
 
         $res['about'] = $event_about;
-        $res['about']['image'] = 'http://appsalesjp.digitalskyonline.com/' . $event_about->image;
+        $res['about']['image'] = 'https://jpsalesapp.technixserv.com/' . $event_about->image;
         $res['about']['welcome_page'] = removeExtraChar(strip_tags($event_about->welcome_page));
-        $res['about']['video_path'] = 'http://appsalesjp.digitalskyonline.com/' . $event_about->video_path;
+        $res['about']['video_path'] = 'https://jpsalesapp.technixserv.com/' . $event_about->video_path;
         $res['event'] = $event_detail;
         $event_info = strip_tags($event_detail->event_info);
         $res['event']['event_info'] = removeExtraChar(explode("\r\n\r\n", $event_info));
         $res['event']['address'] = removeExtraChar(strip_tags($event_detail->address));
-        $res['event']['qr_code'] = 'http://appsalesjp.digitalskyonline.com/' . $event_detail->qr_code;
+        $res['event']['qr_code'] = 'https://jpsalesapp.technixserv.com/' . $event_detail->qr_code;
         $res['event']['h_title'] = "DO'S & DON'TS";
         $res['event']['h_number'] = "SOME IMPORTANT NUMBERS";
         $res['event']['p1_title'] = "WhatsApp Hotline";
@@ -503,7 +530,7 @@ class APIController extends Controller
         $res = @$speakers;
         foreach ($speakers as $key => $speaker) {
             $res[$key]['about'] = removeExtraChar(strip_tags($speaker->about));
-            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $speaker->image;
+            $res[$key]['image'] = 'https://jpsalesapp.technixserv.com/' . $speaker->image;
         }
 
         return response()->json($res, 200);
@@ -531,7 +558,7 @@ class APIController extends Controller
         $res1 = @$event_lists;
         foreach ($speakers as $key => $speaker) {
             $res[$key]['about'] = removeExtraChar(strip_tags($speaker->about));
-            $res[$key]['image'] = 'http://appsalesjp.digitalskyonline.com/' . $speaker->image;
+            $res[$key]['image'] = 'https://jpsalesapp.technixserv.com/' . $speaker->image;
             foreach ($event_lists as $key1 => $event_list) {
                 $res[$key1]['event_date'] = Carbon::createFromFormat('d/m/Y', $event_list->event_date)->format('M d l');
                 $res[$key1]['event_time'] = $event_list->tab_time;
@@ -553,7 +580,7 @@ class APIController extends Controller
             // $res = @$speaker;    
             $res['name'] = removeExtraChar(strip_tags(@$speaker->name));
             $res['about'] = removeExtraChar(strip_tags(@$speaker->about));
-            $res['image'] = 'http://appsalesjp.digitalskyonline.com/' . @$speaker->image;
+            $res['image'] = 'https://jpsalesapp.technixserv.com/' . @$speaker->image;
             $res['social_media'] = [
                 "facebook" => @$speaker->facebook,
                 "twitter" => @$speaker->twitter,
@@ -607,7 +634,7 @@ class APIController extends Controller
 
         $res = $events;
         foreach ($events as $key => $event) {
-            $res[$key]['video_path'] = 'http://appsalesjp.digitalskyonline.com/' . $event->video_path;
+            $res[$key]['video_path'] = 'https://jpsalesapp.technixserv.com/' . $event->video_path;
             $res[$key]['location'] = removeExtraChar($event->location);
             $res[$key]['event_date'] = $event->event_from_date->format('d') . '-' . $event->event_to_date->format('d M, Y');
         }
@@ -668,7 +695,7 @@ class APIController extends Controller
         foreach ($query as $key => $chat) {
             $res[$key]['to_user_id'] = $chat->to_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'https://jpsalesapp.technixserv.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_at;
             $res[$key]['last_message'] = $chat->message;
         }
@@ -693,7 +720,7 @@ class APIController extends Controller
             $res[$key]['from_user_id'] = $chat->from_user_id;
             $res[$key]['to_user_id'] = $chat->to_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'https://jpsalesapp.technixserv.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_at;
             $res[$key]['last_message'] = $chat->message;
         }
@@ -710,7 +737,7 @@ class APIController extends Controller
         foreach ($query as $key => $chat) {
             $res[$key]['user_id'] = $chat->from_user_id;
             $res[$key]['user_name'] = $chat->user_email;
-            $res[$key]['profile_img'] = 'http://appsalesjp.digitalskyonline.com/' . $chat->profile_img;
+            $res[$key]['profile_img'] = 'https://jpsalesapp.technixserv.com/' . $chat->profile_img;
             $res[$key]['last_active'] = $chat->created_date . '-' . $chat->created_time;
             $res[$key]['last_message'] = $chat->message;
         }
