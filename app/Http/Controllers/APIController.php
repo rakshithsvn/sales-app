@@ -49,7 +49,7 @@ class APIController extends Controller
         if ($exist) {
             return $this->create400Error([
                 'message' => 'Already registered. Please login.',
-                'status' => false
+                'success' => false
             ]);
         }
         $user = EventUserRepository::create($request);
@@ -64,6 +64,7 @@ class APIController extends Controller
         // $user_rewards = DB::table('user_rewards')->insert($request->all());
 
         $result = [
+            'success' => true,
             'message' => 'Registration done Successfully',
             'data' => [
                 'token' => $this->generateEventLoginToken($user->id, 1),
@@ -82,7 +83,7 @@ class APIController extends Controller
             ]
         ];
 
-        return response()->json([$result], 200);
+        return response()->json($result, 200);
     }
 
     private function create400Error($array)
@@ -102,7 +103,7 @@ class APIController extends Controller
         if (!$user) {
             $response = $this->create400Error([
                 'message' => 'User not found',
-                'status' => false
+                'success' => false
             ]);
             return [$response, null];
         }
@@ -110,7 +111,7 @@ class APIController extends Controller
         if ($user->is_verified == 0) {
             $response = $this->create400Error([
                 'message' => 'User not Verified',
-                'status' => false
+                'success' => false
             ]);
             return [$response, null];
         }
@@ -144,11 +145,12 @@ class APIController extends Controller
         if (!$passwordMatches) {
             return $this->create400Error([
                 'message' => 'Invalid credentials',
-                'status' => false
+                'success' => false
             ]);
         }
 
         $result = [
+            'success' => true,
             'message' => 'Logged in Successfully',
             'data' => [
                 'refreshed_token' => $this->generateEventLoginToken($user->id, 1),
@@ -167,7 +169,7 @@ class APIController extends Controller
             ]
         ];
 
-        return response()->json([$result], 200);
+        return response()->json($result, 200);
     }
 
     public function getUsers()
@@ -193,6 +195,7 @@ class APIController extends Controller
         $user = EventUser::where('is_verified', 1)->whereNotNull('email')->find($request->user_id);
 
         $result = [
+            'success' => true,
             'message' => 'User data fetched Successfully',
             'data' => [
                 'refreshed_token' => $this->generateEventLoginToken($user->id, 1),
@@ -211,59 +214,77 @@ class APIController extends Controller
             ]
         ];
 
-        return response()->json([$result], 200);
+        return response()->json($result, 200);
     }
 
     public function getProducts()
     {
-        $result = [];
+        $product_list = [];
         $products = DB::table('products')->where('active', '1')->get();
 
         foreach ($products as $key => $product) {
-            $result[$key]['product_id'] = $product->id;
-            $result[$key]['product_name'] = $product->name;
-            $result[$key]['min_purchase_qty'] = $product->min_purchase_qty;
-            $result[$key]['price'] = $product->price;
-            $result[$key]['reward_points'] = $product->reward_points;
-            $result[$key]['product_img'] = 'https://jpsalesapp.technixserv.com/' . $product->image;
+            $product_list[$key]['product_id'] = $product->id;
+            $product_list[$key]['product_name'] = $product->name;
+            $product_list[$key]['min_purchase_qty'] = $product->min_purchase_qty;
+            $product_list[$key]['price'] = $product->price;
+            $product_list[$key]['reward_points'] = $product->reward_points;
+            $product_list[$key]['product_img'] = 'https://jpsalesapp.technixserv.com/' . $product->image;
         }
+
+        $result = [
+            'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => $product_list
+        ];
 
         return response()->json($result, 200);
     }
 
     public function getDealers(Request $request)
     {
-        $result = [];
+        $dealer_list = [];
         $dealers = DB::table('dealers')->where('active', '1')->where('is_verified', '1')
             ->where(function ($q) use ($request) {
                 $q->where('user_id', $request->user_id)->orWhere('user_id', 0);
             })->get();
 
         foreach ($dealers as $key => $dealer) {
-            $result[$key]['dealer_id'] = $dealer->id;
-            $result[$key]['dealer_name'] = $dealer->name;
-            $result[$key]['dealer_address'] = $dealer->address;
-            $result[$key]['mob_number'] = $dealer->mobile_number;
-            $result[$key]['isVerified'] = $dealer->is_verified;
+            $dealer_list[$key]['dealer_id'] = $dealer->id;
+            $dealer_list[$key]['dealer_name'] = $dealer->name;
+            $dealer_list[$key]['dealer_address'] = $dealer->address;
+            $dealer_list[$key]['mob_number'] = $dealer->mobile_number;
+            $dealer_list[$key]['isVerified'] = $dealer->is_verified ? true : false;
         }
+
+        $result = [
+            'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => $dealer_list
+        ];
 
         return response()->json($result, 200);
     }
 
     public function getPurchaseList(Request $request)
     {
-        $result = [];
+        $purchase_list = [];
         $purchases = DB::table('user_purchases')->where('user_id', $request->user_id)->get();
 
         foreach ($purchases as $key => $purchase) {
             $product = DB::table('products')->find($purchase->product_id);
             $dealer =  DB::table('dealers')->find($purchase->product_id);
-            $result[$key]['purchase_id'] = $purchase->id;
-            $result[$key]['product_name'] = $product->name;
-            $result[$key]['qty'] = $purchase->quantity;
-            $result[$key]['dealer_name'] = $dealer->name;
-            $result[$key]['invoice_url'] = 'https://jpsalesapp.technixserv.com/' . $purchase->invoice_url;
+            $purchase_list[$key]['purchase_id'] = $purchase->id;
+            $purchase_list[$key]['product_name'] = $product->name;
+            $purchase_list[$key]['qty'] = $purchase->quantity;
+            $purchase_list[$key]['dealer_name'] = $dealer->name;
+            $purchase_list[$key]['invoice_url'] = 'https://jpsalesapp.technixserv.com/' . $purchase->invoice_url;
         }
+
+        $result = [
+            'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => ["purchases" => $purchase_list]
+        ];
 
         return response()->json($result, 200);
     }
@@ -271,27 +292,37 @@ class APIController extends Controller
     public function getRewardPoints(Request $request)
     {
         $result = [];
-        $rewards = DB::table('user_rewards')->where('user_id', $request->user_id)->get();
+        $reward = DB::table('user_rewards')->where('user_id', $request->user_id)->first();
 
-        foreach ($rewards as $key => $reward) {
-
-            $result[$key]['target_reward'] = $reward->target_reward;
-            $result[$key]['user_reward'] = $reward->user_reward;
-        }
+        $result = [
+            'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => [
+                'target_reward' => $reward->target_reward,
+                'user_reward' => $reward->user_reward,
+                'pending_claims' => 0
+            ]
+        ];
 
         return response()->json($result, 200);
     }
 
     public function getHelpMessages()
     {
-        $result = [];
+        $msg_list = [];
         $messages = DB::table('help_messages')->where('active', '1')->get();
 
         foreach ($messages as $key => $help) {
-            $result[$key]['help_id'] = $help->id;
-            $result[$key]['title'] = $help->title;
-            $result[$key]['description'] = $help->description;
+            $msg_list[$key]['help_id'] = $help->id;
+            $msg_list[$key]['title'] = $help->title;
+            $msg_list[$key]['description'] = $help->description;
         }
+
+        $result = [
+            'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => $msg_list
+        ];
 
         return response()->json($result, 200);
     }
@@ -304,7 +335,7 @@ class APIController extends Controller
         if ($exist) {
             return $this->create400Error([
                 'message' => 'Already Exists. Please try with other Product.',
-                'status' => false
+                'success' => false
             ]);
         }
         $res = DB::table('products')->insert($request->all());
@@ -312,6 +343,7 @@ class APIController extends Controller
         if ($res) {
             $product = DB::table('products')->latest()->first();
             $result = [
+                'success' => true,
                 'message' => 'Product added Successfully',
                 'data' => [
                     'product_id' => $product->id,
@@ -323,7 +355,7 @@ class APIController extends Controller
                 ]
             ];
 
-            return response()->json([$result], 200);
+            return response()->json($result, 200);
         }
     }
 
@@ -335,7 +367,7 @@ class APIController extends Controller
         if ($exist) {
             return $this->create400Error([
                 'message' => 'Already Exists. Please try with other Dealer.',
-                'status' => false
+                'success' => false
             ]);
         }
 
@@ -344,17 +376,18 @@ class APIController extends Controller
         if ($res) {
             $dealer = DB::table('dealers')->latest()->first();
             $result = [
+                'success' => true,
                 'message' => 'Dealer added Successfully',
                 'data' => [
                     'dealer_id' => $dealer->id,
                     'dealer_name' => $dealer->name,
                     'dealer_address' => $dealer->address,
                     'mob_number' => $dealer->mobile_number,
-                    'isVerified' => $dealer->is_verified,
+                    'isVerified' => $dealer->is_verified ? true : false,
                 ]
             ];
 
-            return response()->json([$result], 200);
+            return response()->json($result, 200);
         }
     }
 
@@ -369,20 +402,14 @@ class APIController extends Controller
             $product = DB::table('products')->find($purchase->product_id);
             $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id)->first();
             $total_reward = ($reward->user_reward * $purchase->quantity) + $product->reward_points;
-            $reward->save('user_reward', $total_reward);
+            // $reward->save('user_reward', $total_reward);
 
             $result = [
+                'success' => true,
                 'message' => 'Purchase added Successfully',
-                'data' => [
-                    'purchase_id' => $purchase->id,
-                    'purchase_name' => $purchase->name,
-                    'purchase_address' => $purchase->address,
-                    'mob_number' => $purchase->mobile_number,
-                    'isVerified' => $purchase->is_verified,
-                ]
             ];
 
-            return response()->json([$result], 200);
+            return response()->json($result, 200);
         }
     }
 
@@ -395,6 +422,7 @@ class APIController extends Controller
         $reward->insert('user_reward', $pending_reward);
 
         $result = [
+            'success' => true,
             'message' => 'Reward Claimed Successfully',
             'data' => [
                 'claimed_reward' => $request->total_rewards,
@@ -402,7 +430,7 @@ class APIController extends Controller
             ]
         ];
 
-        return response()->json([$result], 200);
+        return response()->json($result, 200);
     }
 
     public function uploadMedia(Request $request)
@@ -423,7 +451,9 @@ class APIController extends Controller
         // $upload->save();
 
         return response()->json([
-            'file_url' => 'https://jpsalesapp.technixserv.com/storage/files/uploads/' . @$filename
+            'success' => true,
+            'message' => "Data Saved Successfully",
+            'img_url' => 'https://jpsalesapp.technixserv.com/storage/files/uploads/' . @$filename
         ]);
     }
 
