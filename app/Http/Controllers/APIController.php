@@ -47,7 +47,7 @@ class APIController extends Controller
     {
         $exist = EventUser::where('email', @$request->email)->first();
         if ($exist) {
-            return $this->create400Error([
+            return $this->create200Error([
                 'message' => 'Already registered. Please login.',
                 'success' => false
             ]);
@@ -60,8 +60,8 @@ class APIController extends Controller
             $user_consumptions = DB::table('user_consumptions')->insert($request->all());
         }
 
-        // $request->replace(['user_id' => $user->id,'target_reward' => 0,'user_reward' => 0]);
-        // $user_rewards = DB::table('user_rewards')->insert($request->all());
+        $request->replace(['user_id' => $user->id,'target_reward' => 0,'user_reward' => 0]);
+        $user_rewards = DB::table('user_rewards')->insert($request->all());
 
         $result = [
             'success' => true,
@@ -93,6 +93,13 @@ class APIController extends Controller
         ]), 400);
     }
 
+    private function create200Error($array)
+    {
+        return response(array_merge($array, [
+            'status_code' => 200
+        ]), 200);
+    }
+
     private function validateUser($user_email, $id, $verified = false)
     {
         $user_email = trim($user_email);
@@ -101,20 +108,20 @@ class APIController extends Controller
         $response = null;
 
         if (!$user) {
-            $response = $this->create400Error([
+            $response = $this->create200Error([
                 'message' => 'User not found',
                 'success' => false
             ]);
             return [$response, null];
         }
 
-        if ($user->is_verified == 0) {
-            $response = $this->create400Error([
-                'message' => 'User not Verified',
-                'success' => false
-            ]);
-            return [$response, null];
-        }
+        //if ($user->is_verified == 0) {
+        //    $response = $this->create400Error([
+        //        'message' => 'User not Verified',
+        //        'success' => false
+        //    ]);
+        //    return [$response, null];
+        //}
         return [null, $user];
     }
 
@@ -143,7 +150,7 @@ class APIController extends Controller
         $passwordMatches = Hash::check($request->password, $user->password);
         // return $passwordMatches;
         if (!$passwordMatches) {
-            return $this->create400Error([
+            return $this->create200Error([
                 'message' => 'Invalid credentials',
                 'success' => false
             ]);
@@ -174,17 +181,23 @@ class APIController extends Controller
 
     public function getUsers()
     {
-        $result = [];
+        $user_list = [];
         $users = EventUser::where('is_verified', 1)->whereNotNull('email')->get();
 
         foreach ($users as $key => $user) {
-            $result[$key]['user_id'] = $user->id;
-            $result[$key]['user_name'] = $user->name;
-            $result[$key]['user_email'] = $user->email;
-            $result[$key]['mob_number'] = $user->mobile_number;
-            $result[$key]['street address'] = $user->address;
-            $result[$key]['lab_name'] = $user->lab_name;
+            $user_list[$key]['user_id'] = $user->id;
+            $user_list[$key]['user_name'] = $user->name;
+            $user_list[$key]['user_email'] = $user->email;
+            $user_list[$key]['mob_number'] = $user->mobile_number;
+            $user_list[$key]['street address'] = $user->address;
+            $user_list[$key]['lab_name'] = $user->lab_name;
         }
+
+	$result = [
+	    'success' => true,
+            'message' => 'Data fetched Successfully',
+            'data' => $user_list
+	];
 
         return response()->json($result, 200);
     }
@@ -192,7 +205,7 @@ class APIController extends Controller
     public function getUserDetail(Request $request)
     {
         $result = [];
-        $user = EventUser::where('is_verified', 1)->whereNotNull('email')->find($request->user_id);
+        $user = EventUser::whereNotNull('email')->find($request->user_id);
 
         $result = [
             'success' => true,
@@ -200,7 +213,7 @@ class APIController extends Controller
             'data' => [
                 'refreshed_token' => $this->generateEventLoginToken($user->id, 1),
                 'user_details' => [
-                    'isAccountActive' => true,
+                    'isAccountActive' => $user->is_verified ? true : false,
                     'user_id' => $user->id,
                     'user_name' => $user->name,
                     'user_email' => $user->email,
@@ -228,7 +241,7 @@ class APIController extends Controller
             $product_list[$key]['min_purchase_qty'] = $product->min_purchase_qty;
             $product_list[$key]['price'] = $product->price;
             $product_list[$key]['reward_points'] = $product->reward_points;
-            $product_list[$key]['product_img'] = 'https://jpsalesapp.technixserv.com/' . $product->image;
+            $product_list[$key]['product_img'] = $product->image;
         }
 
         $result = [
@@ -243,7 +256,7 @@ class APIController extends Controller
     public function getDealers(Request $request)
     {
         $dealer_list = [];
-        $dealers = DB::table('dealers')->where('active', '1')->where('is_verified', '1')
+        $dealers = DB::table('dealers')->where('active', '1')
             ->where(function ($q) use ($request) {
                 $q->where('user_id', $request->user_id)->orWhere('user_id', 0);
             })->get();
@@ -274,10 +287,10 @@ class APIController extends Controller
             $product = DB::table('products')->find($purchase->product_id);
             $dealer =  DB::table('dealers')->find($purchase->product_id);
             $purchase_list[$key]['purchase_id'] = $purchase->id;
-            $purchase_list[$key]['product_name'] = $product->name;
+            $purchase_list[$key]['product_name'] = @$product->name;
             $purchase_list[$key]['qty'] = $purchase->quantity;
-            $purchase_list[$key]['dealer_name'] = $dealer->name;
-            $purchase_list[$key]['invoice_url'] = 'https://jpsalesapp.technixserv.com/' . $purchase->invoice_url;
+            $purchase_list[$key]['dealer_name'] = @$dealer->name;
+            $purchase_list[$key]['invoice_url'] = $purchase->invoice_url;
         }
 
         $result = [
@@ -300,7 +313,7 @@ class APIController extends Controller
             'data' => [
                 'target_reward' => $reward->target_reward,
                 'user_reward' => $reward->user_reward,
-                'pending_claims' => 0
+                'pending_claims' => $reward->pending_claims,
             ]
         ];
 
@@ -333,7 +346,7 @@ class APIController extends Controller
 
         $exist = DB::table('products')->where('name', @$request->name)->first();
         if ($exist) {
-            return $this->create400Error([
+            return $this->create200Error([
                 'message' => 'Already Exists. Please try with other Product.',
                 'success' => false
             ]);
@@ -351,7 +364,7 @@ class APIController extends Controller
                     'min_purchase_qty' => $product->min_purchase_qty,
                     'price' => $product->price,
                     'reward_points' => $product->reward_points,
-                    'product_img' => 'https://jpsalesapp.technixserv.com/' . $product->image,
+                    'product_img' => $product->image,
                 ]
             ];
 
@@ -365,7 +378,7 @@ class APIController extends Controller
 
         $exist = DB::table('dealers')->where('user_id', $request->user_id)->where('name', $request->name)->first();
         if ($exist) {
-            return $this->create400Error([
+            return $this->create200Error([
                 'message' => 'Already Exists. Please try with other Dealer.',
                 'success' => false
             ]);
@@ -400,9 +413,9 @@ class APIController extends Controller
         if ($res) {
             $purchase = DB::table('user_purchases')->find($res);
             $product = DB::table('products')->find($purchase->product_id);
-            $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id)->first();
-            $total_reward = ($reward->user_reward * $purchase->quantity) + $product->reward_points;
-            // $reward->save('user_reward', $total_reward);
+            $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id);
+            $total_reward = ($product->reward_points * $purchase->quantity) + $reward->first()->user_reward;
+            $reward->update(array('user_reward'=> $total_reward));
 
             $result = [
                 'success' => true,
@@ -415,18 +428,15 @@ class APIController extends Controller
 
     public function claimRewards(Request $request)
     {
-
-        $reward = DB::table('user_rewards')->where('user_id', $request->user_id)->get();
-        $pending_reward = $reward->user_reward - $request->total_rewards;
-
-        $reward->insert('user_reward', $pending_reward);
-
-        $result = [
+        $reward = DB::table('user_rewards')->where('user_id', $request->user_id);
+        //$pending_reward = $reward->first()->user_reward - $request->total_rewards;
+        $reward->update(array('user_reward'=>0,'pending_claims'=> $request->total_rewards));
+        
+	$result = [
             'success' => true,
             'message' => 'Reward Claimed Successfully',
             'data' => [
-                'claimed_reward' => $request->total_rewards,
-                'pending_reward' => $pending_reward
+                'pending_claimed_reward' => $request->total_rewards
             ]
         ];
 

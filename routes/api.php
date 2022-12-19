@@ -25,9 +25,9 @@ Route::prefix('api/v1')->group(function () {
     Route::post('auth', [APIController::class, 'login'])->name('auth');
 
     Route::get('getUsers', [APIController::class, 'getUsers'])->name('getUsers');
+    Route::get('getProducts', [APIController::class, 'getProducts'])->name('getProducts');
 
     Route::middleware('verifyToken')->get('getUserDetail', [APIController::class, 'getUserDetail'])->name('getUserDetail');
-    Route::middleware('verifyToken')->get('getProducts', [APIController::class, 'getProducts'])->name('getProducts');
     Route::middleware('verifyToken')->get('getDealers', [APIController::class, 'getDealers'])->name('getDealers');
     Route::middleware('verifyToken')->get('getHelpMessages', [APIController::class, 'getHelpMessages'])->name('getHelpMessages');
     Route::middleware('verifyToken')->get('getPurchaseList', [APIController::class, 'getPurchaseList'])->name('getPurchaseList');

@@ -41,10 +41,10 @@ class checkTokenIsValid
             return $errorResponse;
         }
 
-        $user = EventUser::where('is_verified', 1)->find($tokenSplit[1]);
-        if(!$user) {
-            return $errorResponse;
-        }
+        //$user = EventUser::where('is_verified', 1)->find($tokenSplit[1]);
+        //if(!$user) {
+        //    return $errorResponse;
+        //}
 
         $accessToken = LinkUser::whereRaw("BINARY `access_token`= ?",[$token])->where('event_user_id', $tokenSplit[1])->first();
         if(!$accessToken) {
