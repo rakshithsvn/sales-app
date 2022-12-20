@@ -21,54 +21,30 @@
         <table class="table table-striped table-hover">
        
         <tr>
-            <th>Name</th>
-            <td>{{$graduation_details->name}}</td>
+            <th>User Name</th>
+            <td>{{$graduation_details->user->name}}</td>
         </tr>
       
         <tr>
-            <th>Contact Number</th>
-            <td>{{$graduation_details->mobile}}</td>
+            <th>Product Name</th>
+            <td>{{$graduation_details->product->name}}</td>
             
         </tr>
 
         <tr>
-            <th>Email Id</th>
-            <td>{{$graduation_details->email}}</td>
+            <th>Quantity</th>
+            <td>{{$graduation_details->quantity}}</td>
         </tr>
-
-       {{--  <tr>
-            <th>Job Title</th>
-            <td>{{$graduation_details->job_title}}</td>            
-        </tr>
-        
-        @if($graduation_details->job_type)
-        <tr>
-            <th>Department</th>
-            <td>{{$graduation_details->job_type}}</td>
-        </tr>
-        @endif --}}
 
         <tr>
-            <th>Subject</th>
-            <td>{{$graduation_details->subject}}</td>
+            <th>Dealer Name</th>
+            <td>{{$graduation_details->dealer->name}}</td>
         </tr>
 
-        @if($graduation_details->message)
-        <tr>
-            <th>Message</th>
-            <td>{{$graduation_details->message}}</td>
-        </tr>
-        @endif
-
-        {{-- <tr>
-            <th>Address</th>
-            <td>{{$graduation_details->address}}</td>
-        </tr> --}}
-
-        {{-- <tr>
-            <th>Resume</th>
-            <td><a href="{{asset('storage/resume')}}/{{$graduation_details->file_path}}" target="_blank"><i class="fa fa-download" title="Click to download" aria-hidden="true"></i></a></td>  
-        </tr>  --}}
+       <tr>
+            <th>Invoice File</th>
+            <td><a href="{{asset('storage/resume')}}/{{$graduation_details->invoice_url}}" target="_blank"><i class="fa fa-download" title="Click to download" aria-hidden="true"></i></a></td>  
+        </tr> 
 
         </table>
 

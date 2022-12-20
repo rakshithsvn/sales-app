@@ -18,38 +18,32 @@
 <div class="row">
     <div class="col-md-12">
         <div class="box">
-            <div class="box-header with-border">
-             
+            <div class="box-header with-border">             
              
                 {!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}
-
+                
+                <div class="row">
                 <div class="col-md-3">
-                    <label for="menus"> From Date</label>
-                    
-                    <div class="input-group input-append date" id="datePicker1">
-                        
-
-                       {!! Form::text('from_date', Request::get('from_date',null), array('id' => 'from_date','class'=>'form-control','placeholder'=>'dd/mm/yyyy')) !!}
+                    <label for="menus"> From Date</label>                    
+                    <div class="input-group input-append date" id="datePicker1">  
+                       {!! Form::text('from_date', Request::get('from_date',null), array('id' => 'from_date','class'=>'form-control','placeholder'=>'DD/MM/YYYY')) !!}
 
                        <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-                   </div>
-                   
+                   </div>                   
                </div>
 
                <div class="col-md-3">
-                <label for="menus"> To Date</label>
-                
+                <label for="menus"> To Date</label>                
                 <div class="input-group input-append date" id="datePicker2">
-
-                    {!! Form::text('to_date', Request::get('to_date',null), array('id' => 'to_date','class'=>'form-control','placeholder'=>'dd/mm/yyyy')) !!}
+                    {!! Form::text('to_date', Request::get('to_date',null), array('id' => 'to_date','class'=>'form-control','placeholder'=>'DD/MM/YYYY')) !!}
                     <span class="input-group-addon add-on"><span class="glyphicon glyphicon-calendar"></span></span>
-                </div>
-                
+                </div>                
             </div>
-            <br/>
+
             <div class="col-md-3">
                <button class="btn btn-success mt-5" type="submit" id="exportData" style="margin-top: 5px"><i class="fa fa-file-excel-o"></i> Download</button>
            </div>
+        </div>
 
        </form>
        
@@ -63,24 +57,26 @@
             <tr>
                 <th style="display:none;">#</th>
                 <th>@lang('Name')</th>
-                <th>@lang('Email')</th>
-                <th>@lang('Mobile')</th>
-                           {{--  <th>@lang('Job Title')</th>
-                           <th style="text-align: center">@lang('Resume')</th> --}}
-                           <th style="text-align: center">@lang('Delete')</th>
-                           <th style="text-align: center">@lang('View')</th>
-                       </tr>
-                   </thead>
-                   
-                   <tbody id="pannel">
+                <th>@lang('Product')</th>
+                <th>@lang('Quantity')</th>
+                <th>@lang('Dealer')</th>
+                <th>@lang('Verified')</th>
+                <th>@lang('Purchase Date')</th>
+                <th>@lang('Invoice')</th>
+                <th style="text-align: center">@lang('Delete')</th>
+                <th style="text-align: center">@lang('View')</th>
+            </tr>
+        </thead>
+        
+        <tbody id="pannel">
 
-                    @include('back.downloads.graduation-table', compact('registered_forms'))
-                </tbody>
-            </table>
-            <div class="pull-right">
-                {!! $registered_forms->render() !!}
-            </div>
-        </div>
+        @include('back.downloads.graduation-table', compact('registered_forms'))
+    </tbody>
+</table>
+<div class="pull-right">
+    {!! $registered_forms->render() !!}
+</div>
+</div>
 
         
 

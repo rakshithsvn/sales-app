@@ -57,6 +57,20 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
     Route::resource('help-messages', 'HelpMessageController');
     Route::name('help-photos.remove')->post('help-photos/removePhoto', 'HelpMessageController@removeGalleryPhoto');
 
+    // Purchase List
+    Route::name('prospects.graduation-index')->get('graduation-registration', [DownloadController::class, 'viewGraduationRegister']);
+
+    Route::name('prospects.graduation-view')->get('prospects/graduation-view/{id}', [DownloadController::class, 'viewFullRegister']);
+
+    Route::post('export-graduation', ['as' => 'prospects.graduation-download', 'uses' => [DownloadController::class, 'getExportGraduationReport']]);
+
+    Route::delete('graduation.destroy/{destroy_id}', [
+        'as' => 'graduation.destroy', 'uses' => [DownloadController::class, 'deleteGraduationForm']
+    ]);
+
+
+    
+
     // Events
     Route::resource('events', 'EventController');
     Route::name('event-photos.remove')->post('event-photos/removePhoto', 'EventController@removeGalleryPhoto');
@@ -198,17 +212,15 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
 
     Route::name('prospects.active')->put('prospects/active/{prospect}/{status?}', [DownloadController::class, 'updateActive']);
 
-    Route::name('prospects.graduation-index')->get('graduation-registration', [DownloadController::class, 'viewGraduationRegister']);
+    // Route::name('prospects.graduation-index')->get('graduation-registration', [DownloadController::class, 'viewGraduationRegister']);
 
-    Route::get('prospects.graduation-view/{id}', [
-        'as' => 'prospects.graduation-view', 'uses' => [DownloadController::class, 'viewFullRegister']
-    ]);
+    // Route::name('prospects.graduation-view')->get('prospects/graduation-view/{id}', [DownloadController::class, 'viewFullRegister']);
 
-    Route::post('export-graduation', ['as' => 'prospects.graduation-download', 'uses' => [DownloadController::class, 'getExportGraduationReport']]);
+    // Route::post('export-graduation', ['as' => 'prospects.graduation-download', 'uses' => [DownloadController::class, 'getExportGraduationReport']]);
 
-    Route::delete('graduation.destroy/{destroy_id}', [
-        'as' => 'graduation.destroy', 'uses' => [DownloadController::class, 'deleteGraduationForm']
-    ]);
+    // Route::delete('graduation.destroy/{destroy_id}', [
+    //     'as' => 'graduation.destroy', 'uses' => [DownloadController::class, 'deleteGraduationForm']
+    // ]);
 
     //Online Application
 
