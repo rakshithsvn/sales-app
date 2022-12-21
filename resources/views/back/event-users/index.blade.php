@@ -60,7 +60,7 @@
                             <th>@lang('Lab Name')</th>
                             <th>@lang('Verified')</th>
                             <th>@lang('Creation')</th>
-                            <th>@lang('Action')</th>
+                            <th width="20%">@lang('Action')</th>
                         </tr>
                         </thead>
                       {{--  <tfoot>

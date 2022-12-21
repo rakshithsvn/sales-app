@@ -58,7 +58,7 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
     Route::name('help-photos.remove')->post('help-photos/removePhoto', 'HelpMessageController@removeGalleryPhoto');
 
     // Purchase List
-    Route::name('prospects.graduation-index')->get('graduation-registration', [DownloadController::class, 'viewGraduationRegister']);
+    Route::name('prospects.graduation-index')->get('purchase-list', [DownloadController::class, 'viewGraduationRegister']);
 
     Route::name('prospects.graduation-view')->get('prospects/graduation-view/{id}', [DownloadController::class, 'viewFullRegister']);
 
