@@ -12,6 +12,7 @@ use App\{
     Models\LinkUser,
     Repositories\EventUserRepository
 };
+use DB;
 
 class EventUserController extends Controller
 {
@@ -172,6 +173,21 @@ class EventUserController extends Controller
         $event_user->delete();
 
         return response()->json();
+    }
+
+    public function userVerify(Request $request)
+    {
+        // dd($request->all());
+
+        $user = EventUser::where('id',$request->id);
+        // dd($user);
+        if($request->is_verified !== null) {
+            $user->update(array('is_verified'=> 1));
+        }
+        $reward = DB::table('user_rewards')->where('user_id', @$user->first()->id);
+        $reward->update(array('target_reward'=> $request->target_reward));
+
+        return redirect()->route('event-users.index')->with('post-ok', __('The user has been successfully verified'));
     }
 
     public function changePassword(EventUser $event_user)

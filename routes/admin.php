@@ -44,6 +44,7 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
 
     Route::get('event-users-change-password/{event_user}', [EventUserController::class, 'changePassword'])->name('event-users.changepassword');
     Route::post('event-users-save-password', [EventUserController::class, 'saveChangePassword'])->name('event_users.storepassword');
+    Route::post('event-users-verify', [EventUserController::class, 'userVerify'])->name('event_users.verify');
 
     // Products
     Route::resource('products', 'ProductController');
