@@ -420,17 +420,16 @@ class DealerController extends Controller
      * @param Dealer $dealer
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Dealer $dealer)
+    public function destroy($id)
     {
         // $this->authorize('manage', $dealer);
 
         //dd($dealer);
 
-        $dealer->delete();
+       	$dealer = Dealer::where('id', $id)->delete();
 
-        DealerTab::where('dealer_id', $dealer->id)->delete();
-
-        return response()->json();
+	// return response()->json();
+	return redirect(route('dealers.index'))->with('Dealer-ok', __('The Dealer deleted successfully'));
     }
 
     public function deleteDealerTabSection(Request $request)

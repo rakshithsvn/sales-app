@@ -144,7 +144,7 @@ SEO Details
                 <a href="" class="popup_selector btn btn-primary" data-inputid="image">@lang('Select an image')</a>
             </div>
             <!-- /btn-group -->
-            <input class="form-control" type="text" id="image" name="image" value="{{ old('image', isset($product) ? $product->image : '') }}">
+            <input class="form-control" type="text" id="image" name="image" value="{{ old('image', isset($product) ? $product->image : '') }}" required>
         </div>
         {!! $errors->first('image', '<span class="help-block">:message</span>') !!}
     </div>
@@ -165,19 +165,19 @@ SEO Details
        <div class="form-group">
         <label for="menus">Price per Unit</label>
     <div class="input-group input-append mb-3" style="width: 100%">
-        <input class="form-control" type="number" name="price" value="{{isset($product) ? $product->price : ''}}">
+        <input class="form-control" type="number" name="price" value="{{isset($product) ? $product->price : ''}}" required>
     </div>
 
     <div class="form-group">
         <label for="menus">Min Quantity</label>
     <div class="input-group input-append mb-3" style="width: 100%">
-        <input class="form-control" type="number" name="min_purchase_qty" value="{{isset($product) ? $product->min_purchase_qty : ''}}">
+        <input class="form-control" type="number" name="min_purchase_qty" value="{{isset($product) ? $product->min_purchase_qty : ''}}" required>
     </div>
 
     <div class="form-group">
         <label for="menus">Reward Points</label>
     <div class="input-group input-append mb-3" style="width: 100%">
-        <input class="form-control" type="number" name="reward_points" value="{{isset($product) ? $product->reward_points : ''}}">
+        <input class="form-control" type="number" name="reward_points" value="{{isset($product) ? $product->reward_points : ''}}" required>
     </div>   
 
 </div>

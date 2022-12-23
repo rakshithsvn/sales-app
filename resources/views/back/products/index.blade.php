@@ -117,7 +117,7 @@
                 .on('change', ':checkbox[name="status"]', function() {
                     back.status(url, $(this), errorAjax)
                 })
-                .on('click', 'td a.btn-danger', function(product) {
+                .on('click', '.btn-danger', function(product) {
                     back.destroy(product, $(this), url, swalTitle, confirmButtonText, cancelButtonText, errorAjax)
                 })
 

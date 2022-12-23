@@ -163,13 +163,13 @@ SEO Details
        <div class="form-group">
         <label for="menus">Mobile Number</label>
     <div class="input-group input-append mb-3" style="width: 100%">
-        <input class="form-control" type="number" name="mobile_number" value="{{isset($dealer) ? $dealer->mobile_number : ''}}">
+        <input class="form-control" type="number" name="mobile_number" value="{{isset($dealer) ? $dealer->mobile_number : ''}}" required>
     </div>
 
     <div class="form-group">
         <label for="menus">Address</label>
     <div class="input-group input-append mb-3" style="width: 100%">
-    <textarea class="form-control" name="address" row=5>{{isset($dealer) ? $dealer->address : ''}}</textarea>
+    <textarea class="form-control" name="address" row=5 required>{{isset($dealer) ? $dealer->address : ''}}</textarea>
     </div>
 
 </div>

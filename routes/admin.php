@@ -4,6 +4,8 @@ use App\Http\Controllers\Back\AdminController;
 use App\Http\Controllers\Back\HomeController;
 use App\Http\Controllers\Back\EventController;
 use App\Http\Controllers\Back\PostController;
+use App\Http\Controllers\Back\ProductController;
+use App\Http\Controllers\Back\DealerController;
 use App\Http\Controllers\Back\FacultyController;
 use App\Http\Controllers\Back\LinkFacultyController;
 use App\Http\Controllers\Back\LinkUserController;
@@ -46,13 +48,15 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
     Route::post('event-users-save-password', [EventUserController::class, 'saveChangePassword'])->name('event_users.storepassword');
 
     // Products
-    Route::resource('products', 'ProductController');
+    Route::resource('products', 'ProductController', ['except' => 'show']);
     Route::name('product-photos.remove')->post('product-photos/removePhoto', 'ProductController@removeGalleryPhoto');
+    Route::get('product.destroy/{product_id}', [ProductController::class, 'destroy'])->name('product.destroy');
 
      // Dealers
     Route::resource('dealers', 'DealerController');
     Route::name('dealer-photos.remove')->post('dealer-photos/removePhoto', 'DealerController@removeGalleryPhoto');
-    
+    Route::get('dealer.destroy/{dealer_id}', [DealerController::class, 'destroy'])->name('dealer.destroy');
+
     // Helps
     Route::resource('help-messages', 'HelpMessageController');
     Route::name('help-photos.remove')->post('help-photos/removePhoto', 'HelpMessageController@removeGalleryPhoto');

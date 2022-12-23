@@ -14,7 +14,9 @@ use App\{
     Models\FacultyDetail,
     Models\FacultyTab,
     Models\LinkFaculty,
-    Models\Notification
+    Models\Notification,
+    Models\Product,
+    Models\Dealer
 };
 use \App\Repositories\EventUserRepository;
 use Illuminate\Http\Request;
@@ -233,7 +235,7 @@ class APIController extends Controller
     public function getProducts()
     {
         $product_list = [];
-        $products = DB::table('products')->where('active', '1')->get();
+        $products = Product::where('active', '1')->get();
 
         foreach ($products as $key => $product) {
             $product_list[$key]['product_id'] = $product->id;
@@ -256,7 +258,7 @@ class APIController extends Controller
     public function getDealers(Request $request)
     {
         $dealer_list = [];
-        $dealers = DB::table('dealers')->where('active', '1')
+        $dealers = Dealer::where('active', '1')
             ->where(function ($q) use ($request) {
                 $q->where('user_id', $request->user_id)->orWhere('user_id', 0);
             })->get();
@@ -281,7 +283,7 @@ class APIController extends Controller
     public function getPurchaseList(Request $request)
     {
         $purchase_list = [];
-        $purchases = DB::table('user_purchases')->where('user_id', $request->user_id)->get();
+        $purchases = DB::table('user_purchases')->where('user_id', $request->user_id)->whereNull('deleted_at')->get();
 
         foreach ($purchases as $key => $purchase) {
             $product = DB::table('products')->find($purchase->product_id);
@@ -305,7 +307,7 @@ class APIController extends Controller
     public function getRewardPoints(Request $request)
     {
         $result = [];
-        $reward = DB::table('user_rewards')->where('user_id', $request->user_id)->first();
+        $reward = DB::table('user_rewards')->where('user_id', $request->user_id)->whereNull('deleted_at')->first();
 
         $result = [
             'success' => true,
@@ -323,7 +325,7 @@ class APIController extends Controller
     public function getHelpMessages()
     {
         $msg_list = [];
-        $messages = DB::table('help_messages')->where('active', '1')->get();
+        $messages = DB::table('help_messages')->where('active', '1')->whereNull('deleted_at')->get();
 
         foreach ($messages as $key => $help) {
             $msg_list[$key]['help_id'] = $help->id;
@@ -351,10 +353,10 @@ class APIController extends Controller
                 'success' => false
             ]);
         }
-        $res = DB::table('products')->insert($request->all());
+        $res = DB::table('products')->insertGetId($request->all());
 
         if ($res) {
-            $product = DB::table('products')->latest()->first();
+            $product = DB::table('products')->find($res);
             $result = [
                 'success' => true,
                 'message' => 'Product added Successfully',
@@ -384,10 +386,10 @@ class APIController extends Controller
             ]);
         }
 
-        $res = DB::table('dealers')->insert($request->all());
+        $res = DB::table('dealers')->insertGetId($request->all());
 
         if ($res) {
-            $dealer = DB::table('dealers')->latest()->first();
+            $dealer = DB::table('dealers')->find($res);
             $result = [
                 'success' => true,
                 'message' => 'Dealer added Successfully',

@@ -218,7 +218,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return view('back.products.show', compact('Product'));
+        return view('back.products.index', compact('product'));
     }
 
     /**
@@ -405,17 +405,18 @@ class ProductController extends Controller
      * @param Product $product
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
         // $this->authorize('manage', $product);
 
-        //dd($product);
+        //dd($id);
 
-        $product->delete();
+        $product = Product::where('id', $id)->delete();
 
-        ProductTab::where('product_id', $product->id)->delete();
+        //ProductTab::where('product_id', $product->id)->delete();
 
-        return response()->json();
+        // return response()->json();
+	return redirect(route('products.index'))->with('Product-ok', __('The Product deleted successfully'));
     }
 
     public function deleteProductTabSection(Request $request)

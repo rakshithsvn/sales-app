@@ -22,7 +22,7 @@
         {{-- <td><a class="btn btn-success" href="{{ route('products.show', [$post->id]) }}" role="button" title="@lang('Show')"><span class="fa fa-eye"></span></a></td>--}}
         <td>
             <a class="btn btn-warning btn-sm" href="{{ route('products.edit', [$post->id]) }}" role="button" title="@lang('Edit')"><span class="fa fa-edit"></span></a>
-            <a class="btn btn-danger btn-sm" href="{{ route('products.destroy', [$post->id]) }}" role="button" title="@lang('Destroy')"><span class="fa fa-trash"></span></a>
+            <a class="btn btn-danger btn-sm" href="{{ route('product.destroy', [$post->id]) }}" role="button" title="@lang('Destroy')"><span class="fa fa-trash"></span></a>
         </td>
     </tr>
     @endforeach
