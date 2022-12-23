@@ -31,216 +31,63 @@
 
 <script src='https://www.google.com/recaptcha/api.js'></script>
 
-<!-- INNER-BANNER -->
-</header>
+@if (session('confirmation-success'))
+@component('front.components.alert')
+@slot('type')
+success
+@endslot
+{!! session('confirmation-success') !!}
+@endcomponent
+@endif
+@if (session('confirmation-danger'))
+@component('front.components.alert')
+@slot('type')
+error
+@endslot
+{!! session('confirmation-danger') !!}
+@endcomponent
+@endif
 
-<section>
-    <div class="breadcrumb-wrapper">
-        <!-- <img data-sizes="auto" data-src="/assets/images/background/5.jpg" class="lazyload img-fluid full-image" alt="Full Image" data-mask="80"> -->
+<!-- Session Status -->
+<x-auth-session-status class="mb-4" :status="session('status')" />
+<span class="login100-form-title p-b-43"> {!! session('status') !!} </span>
+
+<form method="POST" action="{{ route('login') }}" class=" validate-form">
+    @csrf
+    <span class="login100-form-title p-b-43"> Login </span>
+
+    <div class="wrap-input100 validate-input" data-validate="Valid email is required: ex@abc.xyz">
+        <input class="input100" type="email" name="email" required autofocus />
+        <span class="focus-input100"></span>
+        <span class="label-input100">Email</span>
     </div>
-</section>
 
-<section id="vision">
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-md-6 col-sm-offset-2 col-md-offset-3">
-                @if (session('confirmation-success'))
-                @component('front.components.alert')
-                @slot('type')
-                success
-                @endslot
-                {!! session('confirmation-success') !!}
-                @endcomponent
-                @endif
-                @if (session('confirmation-danger'))
-                @component('front.components.alert')
-                @slot('type')
-                error
-                @endslot
-                {!! session('confirmation-danger') !!}
-                @endcomponent
-                @endif
+    <div class="wrap-input100 validate-input" data-validate="Password is required">
+        <input class="input100" type="password" name="password" required />
+        <span class="focus-input100"></span>
+        <span class="label-input100">Password</span>
+    </div>
 
-                <!-- Session Status -->
-                <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="form-group set-max-iframe-height col-md-12 mb-4">
+        <div class="g-recaptcha" data-sitekey="{{ config('app.site_key') }}"></div>
+    </div>
 
-                <!-- Validation Errors -->
-                {{-- <x-auth-validation-errors class="mb-4" :errors="$errors" /> --}}
-
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
-
-                    {{-- <!-- Email Address -->
-                <div class="mb-4">
-                    <x-label for="email" :value="__('Email')" />
-                    <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-                </div>
-
-                <!-- Password -->
-                <div class="mt-4">
-                    <x-label for="password" :value="__('Password')" />
-                    <x-input id="password" class="block mt-1 w-full"
-                    type="password"
-                    name="password"
-                    required autocomplete="current-password" />
-                </div>
-
-                <!-- Remember Me -->
-                <!-- <div class="block mt-4">
-                    <label for="remember_me" class="inline-flex items-center">
-                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-                        <span class="ml-2 text-sm text-gray-600">{{ __('Remembers me') }}</span>
-                    </label>
-            </div> -->
-
-            <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-                @endif
-
-                <x-button class="ml-3">
-                    {{ __('Log in') }}
-                </x-button>
-            </div>
-            </form> --}}
-
-
-
-            @if ($errors->has('email'))
-            @component('front.components.error')
-            {{ $errors->first('email') }}
-            @endcomponent
-            @endif
-            <fieldset>
-                <div>
-                    <h2 style="margin-top: 30px;">Please Sign In</h2>
-                    <hr class="colorgraph">
-
-                    <div class="form-group mb-4">
-                        {{-- <input id="email" type="text" placeholder="@lang('Login')" class="full-width" name="email" value="{{ old('email') }}" required autofocus> --}}
-                        <input type="text" name="email" id="email" class="form-control input-lg" value="{{ old('email') }}" placeholder="@lang('Login')" required autofocus>
-                    </div>
-                    <div class="form-group mb-4">
-                        {{-- <input id="password" type="password" placeholder="@lang('Password')" class="full-width" name="password" required>  --}}
-                        <input type="password" name="password" id="password" class="form-control input-lg password-text" placeholder="@lang('Password')" required>
+    <!-- <div class="flex-sb-m w-full p-t-3 p-b-32">
+                    <div class="contact100-form-checkbox">
+                        <input class="input-checkbox100" id="ckb1" type="checkbox" name="remember-me" />
+                        <label class="label-checkbox100" for="ckb1">
+                            Remember me
+                        </label>
                     </div>
 
-                    <div class="form-group set-max-iframe-height col-md-12 mb-4">
-                        <div class="g-recaptcha" data-sitekey="{{ config('app.site_key') }}"></div>
+                    <div>
+                        <a href="#" class="txt1"> Forgot Password? </a>
                     </div>
+                </div> -->
 
-                    <!-- Remember Me -->
-                    <!-- <div class="form-group">
-                        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 input-lg"  name="remember">
-                        <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-                    </div> -->
-
-                    {{-- <div class="form-group">
-                        @if (Route::has('password.request'))
-                        <a class="underline text-sm text-gray-600 hover:text-gray-900 input-lg" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                    </a>
-                    @endif
-                </div> --}}
-
-                <div class="form-group mb-4">
-                    <input class="btn btn-lg btn-primary btn-block" type="submit" value="@lang('Login')">
-                    {{-- <a href="" class="btn btn-lg btn-primary btn-block reduce-pad color_white">Login</a>  --}}
-
-                </div>
-
-        </div>
-        </fieldset>
-        </form>
+    <div class="container-login100-form-btn p-t-30">
+        <button class="login100-form-btn" type="submit">Login</button>
     </div>
-
-    </div>
-    </div>
-</section>
+</form>
 
 @endsection
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{{--
-
-
-
-
-
-
-<x-guest-layout>
-    <x-auth-card>
-        <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
-            </a>
-        </x-slot>
-
-        <!-- Session Status -->
-        <x-auth-session-status class="mb-4" :status="session('status')" />
-
-        <!-- Validation Errors -->
-        <x-auth-validation-errors class="mb-4" :errors="$errors" />
-
-        <form method="POST" action="{{ route('login') }}">
-@csrf
-
-<!-- Email Address -->
-<div>
-    <x-label for="email" :value="__('Email')" />
-
-    <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-</div>
-
-<!-- Password -->
-<div class="mt-4">
-    <x-label for="password" :value="__('Password')" />
-
-    <x-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
-</div>
-
-<!-- Remember Me -->
-<div class="block mt-4">
-    <label for="remember_me" class="inline-flex items-center">
-        <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" name="remember">
-        <span class="ml-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-    </label>
-</div>
-
-<div class="flex items-center justify-end mt-4">
-    @if (Route::has('password.request'))
-    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
-        {{ __('Forgot your password?') }}
-    </a>
-    @endif
-
-    <x-button class="ml-3">
-        {{ __('Log in') }}
-    </x-button>
-</div>
-</form>
-</x-auth-card>
-</x-guest-layout>
---}}
