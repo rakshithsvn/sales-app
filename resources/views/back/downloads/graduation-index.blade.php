@@ -63,8 +63,7 @@
                 <th>@lang('Verified')</th>
                 <th>@lang('Purchase Date')</th>
                 <th>@lang('Invoice')</th>
-                <th style="text-align: center">@lang('Delete')</th>
-                <th style="text-align: center">@lang('View')</th>
+                <th style="text-align: center">@lang('Action')</th>
             </tr>
         </thead>
         
@@ -95,7 +94,7 @@
 
     var post = (function () {
         var url = '{{ route('prospects.graduation-index') }}'
-        var swalTitle = '@lang('Really destroy the file ?')'
+        var swalTitle = '@lang('Really destroy the purchase ?')'
         var confirmButtonText = '@lang('Yes')'
         var cancelButtonText = '@lang('No')'
         var errorAjax = '@lang('Looks like there is a server issue...')'

@@ -156,7 +156,7 @@ class DownloadController extends Controller
    * @param  bool $status
    * @return \Illuminate\Http\Response
    */
-  public function updateActive(DownloadProspect $prospect, $status = false)
+  public function updateActive(UserPurchase $prospect, $status = false)
   {
     $prospect->active = $status;
     $prospect->save();
@@ -276,6 +276,7 @@ class DownloadController extends Controller
 
   public function deleteGraduationForm(UserPurchase $destroy_id)
   {
+    // dd($destroy_id);
     $destroy_id->delete();
     return response()->json();
   }

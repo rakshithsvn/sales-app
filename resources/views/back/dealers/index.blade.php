@@ -19,13 +19,13 @@
 <div class="row">
     <div class="col-md-12">
         <div class="box">
-            <div class="box-header with-border">
+            <!-- <div class="box-header with-border">
                 <strong>@lang('Status') :</strong> &nbsp;
                 <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
                 <input type="checkbox" name="active" @if(request()->active) checked @endif> @lang('Active')&nbsp;
                 <input type="text" class="pull-right" id="searchContent">
                 <div id="spinner" class="text-center"></div>
-            </div>
+            </div> -->
             <div class="box-body table-responsive">
                 <table id="users" class="table table-striped table-bordered">
                     <thead>
@@ -37,7 +37,7 @@
                             <th>@lang('Verified')</th>
                             <th>@lang('Active')<span id="active" class="fa fa-sort pull-right" aria-hidden="true"></span></th>
                             <th>@lang('Creation')<span id="created_at" class="fa fa-sort-desc pull-right" aria-hidden="true"></span></th>
-                            <th>@lang('New')</th>
+                            <!-- <th>@lang('New')</th> -->
                             {{-- <th>@lang('SEO Title')<span id="seo_title" class="fa fa-sort pull-right" aria-hidden="true"></span></th> --}}
                             <th>@lang('Action')</th>
                         </tr>
@@ -97,37 +97,55 @@
 @section('js')
 <script src="{{ asset('adminlte/js/back.js') }}"></script>
 <script>
-    var post = (function() {
 
+    var post = (function () {
         var url = '{{ route('dealers.index') }}'
-        var swalTitle = '@lang('
-        Are you sure want to delete ? ')'
-        var confirmButtonText = '@lang('Yes ')'
-        var cancelButtonText = '@lang('No ')'
-        var errorAjax = '@lang('
-        Looks like there is a server issue...')'
+        var swalTitle = '@lang('Really destroy the dealer ?')'
+        var confirmButtonText = '@lang('Yes')'
+        var cancelButtonText = '@lang('No')'
+        var errorAjax = '@lang('Looks like there is a server issue...')'
 
-        var onReady = function() {
-            $('#pagination').on('click', 'ul.pagination a', function(product) {
-                back.pagination(product, $(this), errorAjax)
+        var onReady = function () {
+            $('#pagination').on('click', 'ul.pagination a', function (event) {
+                back.pagination(event, $(this), errorAjax)
             })
-            $('#pannel').on('change', ':checkbox[name="seen"]', function() {
-                    back.seen(url, $(this), errorAjax)
+            $('#pannel').on('change', ':checkbox[name="status"]', function () {
+                back.status(url, $(this), errorAjax)
+            })
+            .on('click', 'td a.btn-danger', function (event) {
+                event.preventDefault()
+                var target = $(this).attr('href');
+                var closest_tr = $(this).closest('tr');
+                swal({
+                    title: swalTitle,
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: '#DD6B55',
+                    confirmButtonText: confirmButtonText,
+                    cancelButtonText: cancelButtonText
+                }).then(function () {
+                    back.spin()
+                    $.ajax({
+                        url: target,
+                        type: 'GET'
+                    })
+                    .done(function () {
+                        back.unSpin()
+                        closest_tr.remove();
+                    })
+                    .fail(function () {
+                        back.fail('@lang('Looks like there is a server issue...')')
+                    }
+                    )
                 })
-                .on('change', ':checkbox[name="status"]', function() {
-                    back.status(url, $(this), errorAjax)
-                })
-                .on('click', 'td a.btn-danger', function(product) {
-                    back.destroy(product, $(this), url, swalTitle, confirmButtonText, cancelButtonText, errorAjax)
-                })
-
-            $('th span').click(function() {
+            })
+            $('th span').click(function () {
                 back.ordering(url, $(this), errorAjax)
             })
-            $('.box-header :radio, .box-header :checkbox').click(function() {
+            $('.box-header :radio, .box-header :checkbox').click(function () {
                 back.filters(url, errorAjax)
             })
-            $(document).on('keyup', '#searchContent', function(product) {
+            $(document).on('keyup', '#searchContent', function (event) {
                 back.search(url, $(this), errorAjax)
             })
         }
@@ -139,5 +157,28 @@
     })()
 
     $(document).ready(post.onReady)
+
 </script>
+<script>
+
+   $(document).ready(function() {
+    var date = new Date();
+    $('#datePicker1')
+    .datepicker({
+        format: 'dd/mm/yyyy',
+        endDate:  new Date(),
+    })
+});
+
+   $(document).ready(function() {
+    var date = new Date();
+    $('#datePicker2')
+    .datepicker({
+        format: 'dd/mm/yyyy',
+        endDate:  new Date(),
+    })
+});
+</script>
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.3.0/js/bootstrap-datepicker.min.js"></script>
 @endsection

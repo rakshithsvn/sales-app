@@ -6,6 +6,7 @@ use App\Http\Controllers\Back\EventController;
 use App\Http\Controllers\Back\PostController;
 use App\Http\Controllers\Back\ProductController;
 use App\Http\Controllers\Back\DealerController;
+use App\Http\Controllers\Back\HelpMessageController;
 use App\Http\Controllers\Back\FacultyController;
 use App\Http\Controllers\Back\LinkFacultyController;
 use App\Http\Controllers\Back\LinkUserController;
@@ -60,18 +61,19 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
 
     // Helps
     Route::resource('help-messages', 'HelpMessageController');
-    Route::name('help-photos.remove')->post('help-photos/removePhoto', 'HelpMessageController@removeGalleryPhoto');
+    Route::name('help-photos.remove')->post('help-photos/removePhoto', 'HelpMessageController@removeGalleryPhoto');    
+    Route::get('help-message.destroy/{help_message_id}', [HelpMessageController::class, 'destroy'])->name('help-message.destroy');
 
     // Purchase List
     Route::name('prospects.graduation-index')->get('purchase-list', [DownloadController::class, 'viewGraduationRegister']);
 
     Route::name('prospects.graduation-view')->get('prospects/graduation-view/{id}', [DownloadController::class, 'viewFullRegister']);
+    
+    Route::name('purchase-list.active')->put('purchase-list/active/{post}/{status?}', [DownloadController::class, 'updateActive']);
 
     Route::post('export-graduation', ['as' => 'prospects.graduation-download', 'uses' => [DownloadController::class, 'getExportGraduationReport']]);
 
-    Route::delete('graduation.destroy/{destroy_id}', [
-        'as' => 'graduation.destroy', 'uses' => [DownloadController::class, 'deleteGraduationForm']
-    ]);
+    Route::delete('graduation.destroy/{destroy_id}', [DownloadController::class, 'deleteGraduationForm'])->name('graduation.destroy');
 
 
     

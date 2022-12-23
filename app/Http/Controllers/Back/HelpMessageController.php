@@ -218,7 +218,7 @@ class HelpMessageController extends Controller
      */
     public function show(HelpMessage $help_message)
     {
-        return view('back.help_messages.show', compact('HelpMessage'));
+        return view('back.help_messages.show', compact('help_message'));
     }
 
     /**
@@ -418,17 +418,16 @@ class HelpMessageController extends Controller
      * @param HelpMessage $help_message
      * @return \Illuminate\Http\Response
      */
-    public function destroy(HelpMessage $help_message)
+    public function destroy($id)
     {
-        // $this->authorize('manage', $help_message);
+        // $this->authorize('manage', $dealer);
 
-        //dd($help_message);
+        //dd($dealer);
 
-        $help_message->delete();
+       	$help = HelpMessage::where('id', $id)->delete();
 
-        HelpMessageTab::where('help_message_id', $help_message->id)->delete();
-
-        return response()->json();
+        // return response()->json();
+        return redirect(route('help-messages.index'))->with('help-ok', __('The Message deleted successfully'));
     }
 
     public function deleteHelpMessageTabSection(Request $request)

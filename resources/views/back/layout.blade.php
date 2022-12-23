@@ -185,6 +185,10 @@ desired effect
         </li>
 
         <li>
+          <a href="{{ route('prospects.graduation-index') }}"><i class="fa fa-shopping-cart"></i> <span>@lang('Purchase History')</span></a>
+        </li>
+
+        <li>
           <a href="{{ route('help-messages.index') }}"><i class="fa fa-question-circle"></i> <span>@lang('Help Messages')</span></a>
         </li>
 

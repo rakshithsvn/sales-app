@@ -15,9 +15,9 @@
             <input type="checkbox" name="status" value="{{ $post->id }}" {{ $post->active ? 'checked' : ''}}>
         </td>
         <td>{{ $post->created_at->formatLocalized('%c') }}</td>
-        <td>
+        <!-- <td>
             <input type="checkbox" name="seen" value="{{ $post->id }}" {{ is_null($post->ingoing) ?  'disabled' : 'checked'}}>
-        </td>
+        </td> -->
         {{-- <td>{{ $post->seo_title }}</td> --}}
         {{-- <td><a class="btn btn-success" href="{{ route('products.show', [$post->id]) }}" role="button" title="@lang('Show')"><span class="fa fa-eye"></span></a></td>--}}
         <td>

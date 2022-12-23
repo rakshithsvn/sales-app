@@ -18,6 +18,8 @@ use App\{
     Models\Product,
     Models\Dealer
 };
+use App\Models\HelpMessage;
+use App\Models\UserPurchase;
 use \App\Repositories\EventUserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -62,7 +64,7 @@ class APIController extends Controller
             $user_consumptions = DB::table('user_consumptions')->insert($request->all());
         }
 
-        $request->replace(['user_id' => $user->id,'target_reward' => 0,'user_reward' => 0]);
+        $request->replace(['user_id' => $user->id, 'target_reward' => 0, 'user_reward' => 0]);
         $user_rewards = DB::table('user_rewards')->insert($request->all());
 
         $result = [
@@ -195,11 +197,11 @@ class APIController extends Controller
             $user_list[$key]['lab_name'] = $user->lab_name;
         }
 
-	$result = [
-	    'success' => true,
+        $result = [
+            'success' => true,
             'message' => 'Data fetched Successfully',
             'data' => $user_list
-	];
+        ];
 
         return response()->json($result, 200);
     }
@@ -283,11 +285,11 @@ class APIController extends Controller
     public function getPurchaseList(Request $request)
     {
         $purchase_list = [];
-        $purchases = DB::table('user_purchases')->where('user_id', $request->user_id)->whereNull('deleted_at')->get();
+        $purchases = UserPurchase::where('user_id', $request->user_id)->get();
 
         foreach ($purchases as $key => $purchase) {
-            $product = DB::table('products')->find($purchase->product_id);
-            $dealer =  DB::table('dealers')->find($purchase->product_id);
+            $product = Product::find($purchase->product_id);
+            $dealer =  Dealer::find($purchase->product_id);
             $purchase_list[$key]['purchase_id'] = $purchase->id;
             $purchase_list[$key]['product_name'] = @$product->name;
             $purchase_list[$key]['qty'] = $purchase->quantity;
@@ -325,7 +327,7 @@ class APIController extends Controller
     public function getHelpMessages()
     {
         $msg_list = [];
-        $messages = DB::table('help_messages')->where('active', '1')->whereNull('deleted_at')->get();
+        $messages = HelpMessage::where('active', '1')->get();
 
         foreach ($messages as $key => $help) {
             $msg_list[$key]['help_id'] = $help->id;
@@ -346,17 +348,17 @@ class APIController extends Controller
     {
         $request->replace(['name' => $request->product_name, 'min_purchase_qty' => $request->min_purchase_qty, 'price' => $request->price, 'reward_points' => $request->reward_points, 'image' => $request->product_img, 'active' => 1]);
 
-        $exist = DB::table('products')->where('name', @$request->name)->first();
+        $exist = Product::where('name', @$request->name)->first();
         if ($exist) {
             return $this->create200Error([
                 'message' => 'Already Exists. Please try with other Product.',
                 'success' => false
             ]);
         }
-        $res = DB::table('products')->insertGetId($request->all());
+        $res = Product::insertGetId($request->all());
 
         if ($res) {
-            $product = DB::table('products')->find($res);
+            $product = Product::find($res);
             $result = [
                 'success' => true,
                 'message' => 'Product added Successfully',
@@ -378,7 +380,7 @@ class APIController extends Controller
     {
         $request->replace(['user_id' => $request->user_id, 'name' => $request->dealer_name, 'address' => $request->dealer_address, 'mobile_number' => $request->mob_number, 'is_verified' => $request->isVerified == true ? 1 : 0, 'active' => 1]);
 
-        $exist = DB::table('dealers')->where('user_id', $request->user_id)->where('name', $request->name)->first();
+        $exist = Dealer::where('user_id', $request->user_id)->where('name', $request->name)->first();
         if ($exist) {
             return $this->create200Error([
                 'message' => 'Already Exists. Please try with other Dealer.',
@@ -386,10 +388,10 @@ class APIController extends Controller
             ]);
         }
 
-        $res = DB::table('dealers')->insertGetId($request->all());
+        $res = Dealer::insertGetId($request->all());
 
         if ($res) {
-            $dealer = DB::table('dealers')->find($res);
+            $dealer = Dealer::find($res);
             $result = [
                 'success' => true,
                 'message' => 'Dealer added Successfully',
@@ -410,14 +412,14 @@ class APIController extends Controller
     {
         $request->replace(['user_id' => $request->user_id, 'product_id' => $request->product_id, 'dealer_id' => $request->dealer_id, 'quantity' => $request->quantity, 'invoice_url' => $request->invoice_url]);
 
-        $res = DB::table('user_purchases')->insertGetId($request->all());
+        $res = UserPurchase::insertGetId($request->all());
 
         if ($res) {
-            $purchase = DB::table('user_purchases')->find($res);
-            $product = DB::table('products')->find($purchase->product_id);
+            $purchase = UserPurchase::find($res);
+            $product = Product::find($purchase->product_id);
             $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id);
             $total_reward = ($product->reward_points * $purchase->quantity) + $reward->first()->user_reward;
-            $reward->update(array('user_reward'=> $total_reward));
+            $reward->update(array('user_reward' => $total_reward));
 
             $result = [
                 'success' => true,
@@ -432,9 +434,9 @@ class APIController extends Controller
     {
         $reward = DB::table('user_rewards')->where('user_id', $request->user_id);
         //$pending_reward = $reward->first()->user_reward - $request->total_rewards;
-        $reward->update(array('user_reward'=>0,'pending_claims'=> $request->total_rewards));
-        
-	$result = [
+        $reward->update(array('user_reward' => 0, 'pending_claims' => $request->total_rewards));
+
+        $result = [
             'success' => true,
             'message' => 'Reward Claimed Successfully',
             'data' => [
