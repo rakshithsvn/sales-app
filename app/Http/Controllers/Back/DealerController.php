@@ -114,99 +114,103 @@ class DealerController extends Controller
         // dd($request->all());
 
         //    $result = $this->repository->store($request);
-
-        if (!empty($request->dealer_from_date) && !empty($request->dealer_to_date)) {
-            $dealer_from_Date = Carbon::createFromFormat('d/m/Y', $request->dealer_from_date)->format('Y-m-d');
-            $dealer_to_Date = Carbon::createFromFormat('d/m/Y', $request->dealer_to_date)->format('Y-m-d');
-
-            $range = CarbonPeriod::create($dealer_from_Date, $dealer_to_Date);
-
-            $dates = $range->toArray();
+        $record_exist = Dealer::where('name', $request->name)->first();
+        // dd($record_exist);
+        if($record_exist) {
+            $result = 'failure';
         } else {
-            $dealer_from_Date = null;
-            $dealer_to_Date = null;
-            $dates = null;
-        }
+            if (!empty($request->dealer_from_date) && !empty($request->dealer_to_date)) {
+                $dealer_from_Date = Carbon::createFromFormat('d/m/Y', $request->dealer_from_date)->format('Y-m-d');
+                $dealer_to_Date = Carbon::createFromFormat('d/m/Y', $request->dealer_to_date)->format('Y-m-d');
 
-        if (isset($request->gallery_images)) {
-            $filepath = "storage/files/dealer_gallery";
-            $gallery_image_name = null;
+                $range = CarbonPeriod::create($dealer_from_Date, $dealer_to_Date);
 
-            foreach ($request->file('gallery_images') as $gallery_image) {
-                $imagename = time() . '_' . $gallery_image->getClientOriginalName();
-                $imagename = str_replace(' ', '', $imagename);
-                $destinationPath = public_path($filepath);
-                $gallery_image->move($destinationPath, $imagename);
-                $gallery_image_name =  $gallery_image_name . ',/' . $filepath . "/" . $imagename;
+                $dates = $range->toArray();
+            } else {
+                $dealer_from_Date = null;
+                $dealer_to_Date = null;
+                $dates = null;
             }
 
-            $gallery_images = $gallery_image_name;
-        } else {
-            $gallery_images = null;
-        }
+            if (isset($request->gallery_images)) {
+                $filepath = "storage/files/dealer_gallery";
+                $gallery_image_name = null;
 
-        // $request->gallery_images = $gallery_images;
-        $request->merge(['dealer_gallery' => $gallery_images]);
+                foreach ($request->file('gallery_images') as $gallery_image) {
+                    $imagename = time() . '_' . $gallery_image->getClientOriginalName();
+                    $imagename = str_replace(' ', '', $imagename);
+                    $destinationPath = public_path($filepath);
+                    $gallery_image->move($destinationPath, $imagename);
+                    $gallery_image_name =  $gallery_image_name . ',/' . $filepath . "/" . $imagename;
+                }
 
-        if ($dates) {
-            $request->merge(['user_id' => auth()->id()]);
-            $request->merge(['active' => $request->has('active')]);
-            $request->merge(['slug' => Str::slug($request->name)]);
-            $request->merge(['dealer_from_date' => $dealer_from_Date]);
-            $request->merge(['dealer_to_date' => $dealer_to_Date]);
-            $request->merge(['body' => $request->body]);
-            $request->merge(['tab_section' => 'N']);
-            $dealer = Dealer::create($request->all());
-
-            foreach ($dates as $key => $value) {
-                $dealer_tab = new DealerTab();
-                $dealer_tab->dealer_id = $dealer->id;
-                $dealer_tab->tab_title = $value->format('d/m/Y');
-                $dealer_tab->tab_image = null;
-                $dealer_tab->tab_body = null;
-                $dealer_tab->user_id = auth()->id();
-                $dealer_tab->save();
+                $gallery_images = $gallery_image_name;
+            } else {
+                $gallery_images = null;
             }
+
+            // $request->gallery_images = $gallery_images;
+            $request->merge(['dealer_gallery' => $gallery_images]);
+
+            if ($dates) {
+                $request->merge(['user_id' => auth()->id()]);
+                $request->merge(['active' => $request->has('active')]);
+                $request->merge(['slug' => Str::slug($request->name)]);
+                $request->merge(['dealer_from_date' => $dealer_from_Date]);
+                $request->merge(['dealer_to_date' => $dealer_to_Date]);
+                $request->merge(['body' => $request->body]);
+                $request->merge(['tab_section' => 'N']);
+                $dealer = Dealer::create($request->all());
+
+                foreach ($dates as $key => $value) {
+                    $dealer_tab = new DealerTab();
+                    $dealer_tab->dealer_id = $dealer->id;
+                    $dealer_tab->tab_title = $value->format('d/m/Y');
+                    $dealer_tab->tab_image = null;
+                    $dealer_tab->tab_body = null;
+                    $dealer_tab->user_id = auth()->id();
+                    $dealer_tab->save();
+                }
+            }
+
+            if (isset($request->tab_section)) {
+                // $request->merge(['user_id' => auth()->id()]);
+                // $request->merge(['active' => $request->has('active')]);
+                // $request->merge(['slug' => Str::slug($request->name)]);           
+                // $request->merge(['dealer_from_date' => $dealer_from_Date]);
+                // $request->merge(['dealer_to_date' => $dealer_to_Date]);
+                // $request->merge(['body' => $request->body]);
+                // $request->merge(['tab_section' => $request->has('tab_section')]);
+                // $dealer = Dealer::create($request->all());
+
+                // foreach ($request->tab_title as $key => $value) {
+
+                //     $dealer_tab = new DealerTab();
+                //     $dealer_tab->dealer_id = $dealer->id;
+                //     $dealer_tab->tab_title = $request->tab_title[$key];
+                //     $dealer_tab->tab_image = $request->tab_image[$key];
+                //     $dealer_tab->tab_body = $request->tab_body[$key];
+                //     $dealer_tab->user_id = auth()->id();
+                //     $dealer_tab->save();
+                // }
+            } else {
+                $request->merge(['user_id' => auth()->id()]);
+                $request->merge(['active' => $request->has('active')]);
+                $request->merge(['is_verified' => $request->has('is_verified')]);
+                $request->merge(['slug' => Str::slug($request->name)]);
+
+                $request->merge(['tab_section' => 'N']);
+
+                $dealer = Dealer::create($request->all());
+            }
+
+            $result = 'success';
         }
-
-        if (isset($request->tab_section)) {
-            // $request->merge(['user_id' => auth()->id()]);
-            // $request->merge(['active' => $request->has('active')]);
-            // $request->merge(['slug' => Str::slug($request->name)]);           
-            // $request->merge(['dealer_from_date' => $dealer_from_Date]);
-            // $request->merge(['dealer_to_date' => $dealer_to_Date]);
-            // $request->merge(['body' => $request->body]);
-            // $request->merge(['tab_section' => $request->has('tab_section')]);
-            // $dealer = Dealer::create($request->all());
-
-            // foreach ($request->tab_title as $key => $value) {
-
-            //     $dealer_tab = new DealerTab();
-            //     $dealer_tab->dealer_id = $dealer->id;
-            //     $dealer_tab->tab_title = $request->tab_title[$key];
-            //     $dealer_tab->tab_image = $request->tab_image[$key];
-            //     $dealer_tab->tab_body = $request->tab_body[$key];
-            //     $dealer_tab->user_id = auth()->id();
-            //     $dealer_tab->save();
-            // }
-        } else {
-            $request->merge(['user_id' => auth()->id()]);
-            $request->merge(['active' => $request->has('active')]);
-            $request->merge(['is_verified' => $request->has('is_verified')]);
-            $request->merge(['slug' => Str::slug($request->name)]);
-
-            $request->merge(['tab_section' => 'N']);
-
-            $dealer = Dealer::create($request->all());
-        }
-
-
-        $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('dealers.index'))->with('Dealer-ok', __('The Dealer has been successfully created'));
+            return redirect(route('dealers.index'))->with('post-ok', __('The Dealer has been successfully created'));
         } else {
-            return redirect(route('dealers.index'))->with('Dealer-danger', __('The Dealer already exist'));
+            return redirect(route('dealers.index'))->with('post-danger', __('The Dealer already exist'));
         }
     }
 
@@ -408,9 +412,9 @@ class DealerController extends Controller
         $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('dealers.index'))->with('Dealer-ok', __('The Dealer has been successfully updated'));
+            return redirect(route('dealers.index'))->with('post-ok', __('The Dealer has been successfully updated'));
         } else {
-            return redirect(route('dealers.index'))->with('Dealer-danger', __('The Dealer already exist. Cannot update'));
+            return redirect(route('dealers.index'))->with('post-danger', __('The Dealer already exist. Cannot update'));
         }
     }
 
@@ -429,7 +433,7 @@ class DealerController extends Controller
        	$dealer = Dealer::where('id', $id)->delete();
 
 	// return response()->json();
-	return redirect(route('dealers.index'))->with('Dealer-ok', __('The Dealer deleted successfully'));
+	return redirect(route('dealers.index'))->with('post-ok', __('The Dealer deleted successfully'));
     }
 
     public function deleteDealerTabSection(Request $request)

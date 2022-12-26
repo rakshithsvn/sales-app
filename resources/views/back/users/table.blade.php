@@ -1,4 +1,4 @@
-@foreach($users as $user)
+@foreach($users as $key=>$user)
 <tr>
     <td>{{ $user->id }}</td>
     <td>{{ $user->name }}</td>
@@ -24,7 +24,7 @@
     <td>{{ @$user->created_at && @$user->created_at->formatLocalized('%c') }}</td>
     <td>
         <a class="btn btn-warning btn-sm" href="{{ route('users.edit', [$user->id]) }}" role="button" title="@lang('Edit')"><span class="fa fa-edit"></span></a>
-        @if($user->id != 1)<a class="btn btn-danger btn-sm" href="{{ route('users.destroy', [$user->id]) }}" role="button" title="@lang('Destroy')"><span class="fa fa-trash"></span></a>@endif
+        @if($key != 0)<a class="btn btn-danger btn-sm" href="{{ route('users.destroy', [$user->id]) }}" role="button" title="@lang('Destroy')"><span class="fa fa-trash"></span></a>@endif
     </td>
 </tr>
 @endforeach

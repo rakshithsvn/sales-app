@@ -98,8 +98,8 @@ class HelpMessageRepository
 
         if (isset($search)) {
             $result =  $result->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', "%" . $search . "%")
-                    ->orWhere('excerpt', 'like', "%" . $search . "%");
+                $query->where('title', 'like', "%" . $search . "%");
+                    // ->orWhere('excerpt', 'like', "%" . $search . "%");
             });
         }
         return $result->paginate($nbrPages);

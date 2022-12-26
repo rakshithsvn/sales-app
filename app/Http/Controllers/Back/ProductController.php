@@ -110,102 +110,105 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-
         // dd($request->all());
 
         //    $result = $this->repository->store($request);
+         $record_exist = Product::where('name', $request->name)->first();
+        // dd($record_exist);
+        if($record_exist) {
+            $result = 'failure';
+         } else {
+            if (!empty($request->product_from_date) && !empty($request->product_to_date)) {
+                $product_from_Date = Carbon::createFromFormat('d/m/Y', $request->product_from_date)->format('Y-m-d');
+                $product_to_Date = Carbon::createFromFormat('d/m/Y', $request->product_to_date)->format('Y-m-d');
 
-        if (!empty($request->product_from_date) && !empty($request->product_to_date)) {
-            $product_from_Date = Carbon::createFromFormat('d/m/Y', $request->product_from_date)->format('Y-m-d');
-            $product_to_Date = Carbon::createFromFormat('d/m/Y', $request->product_to_date)->format('Y-m-d');
+                $range = CarbonPeriod::create($product_from_Date, $product_to_Date);
 
-            $range = CarbonPeriod::create($product_from_Date, $product_to_Date);
-
-            $dates = $range->toArray();
-        } else {
-            $product_from_Date = null;
-            $product_to_Date = null;
-            $dates = null;
-        }
-
-        if (isset($request->gallery_images)) {
-            $filepath = "storage/files/product_gallery";
-            $gallery_image_name = null;
-
-            foreach ($request->file('gallery_images') as $gallery_image) {
-                $imagename = time() . '_' . $gallery_image->getClientOriginalName();
-                $imagename = str_replace(' ', '', $imagename);
-                $destinationPath = public_path($filepath);
-                $gallery_image->move($destinationPath, $imagename);
-                $gallery_image_name =  $gallery_image_name . ',/' . $filepath . "/" . $imagename;
+                $dates = $range->toArray();
+            } else {
+                $product_from_Date = null;
+                $product_to_Date = null;
+                $dates = null;
             }
 
-            $gallery_images = $gallery_image_name;
-        } else {
-            $gallery_images = null;
-        }
+            if (isset($request->gallery_images)) {
+                $filepath = "storage/files/product_gallery";
+                $gallery_image_name = null;
 
-        // $request->gallery_images = $gallery_images;
-        $request->merge(['product_gallery' => $gallery_images]);
+                foreach ($request->file('gallery_images') as $gallery_image) {
+                    $imagename = time() . '_' . $gallery_image->getClientOriginalName();
+                    $imagename = str_replace(' ', '', $imagename);
+                    $destinationPath = public_path($filepath);
+                    $gallery_image->move($destinationPath, $imagename);
+                    $gallery_image_name =  $gallery_image_name . ',/' . $filepath . "/" . $imagename;
+                }
 
-        if ($dates) {
-            $request->merge(['user_id' => auth()->id()]);
-            $request->merge(['active' => $request->has('active')]);
-            $request->merge(['slug' => Str::slug($request->name)]);
-            $request->merge(['product_from_date' => $product_from_Date]);
-            $request->merge(['product_to_date' => $product_to_Date]);
-            $request->merge(['body' => $request->body]);
-            $request->merge(['tab_section' => 'N']);
-            $product = Product::create($request->all());
-
-            foreach ($dates as $key => $value) {
-                $product_tab = new ProductTab();
-                $product_tab->product_id = $product->id;
-                $product_tab->tab_title = $value->format('d/m/Y');
-                $product_tab->tab_image = null;
-                $product_tab->tab_body = null;
-                $product_tab->user_id = auth()->id();
-                $product_tab->save();
+                $gallery_images = $gallery_image_name;
+            } else {
+                $gallery_images = null;
             }
+
+            // $request->gallery_images = $gallery_images;
+            $request->merge(['product_gallery' => $gallery_images]);
+
+            if ($dates) {
+                $request->merge(['user_id' => auth()->id()]);
+                $request->merge(['active' => $request->has('active')]);
+                $request->merge(['slug' => Str::slug($request->name)]);
+                $request->merge(['product_from_date' => $product_from_Date]);
+                $request->merge(['product_to_date' => $product_to_Date]);
+                $request->merge(['body' => $request->body]);
+                $request->merge(['tab_section' => 'N']);
+                $product = Product::create($request->all());
+
+                foreach ($dates as $key => $value) {
+                    $product_tab = new ProductTab();
+                    $product_tab->product_id = $product->id;
+                    $product_tab->tab_title = $value->format('d/m/Y');
+                    $product_tab->tab_image = null;
+                    $product_tab->tab_body = null;
+                    $product_tab->user_id = auth()->id();
+                    $product_tab->save();
+                }
+            }
+
+            if (isset($request->tab_section)) {
+                // $request->merge(['user_id' => auth()->id()]);
+                // $request->merge(['active' => $request->has('active')]);
+                // $request->merge(['slug' => Str::slug($request->name)]);           
+                // $request->merge(['product_from_date' => $product_from_Date]);
+                // $request->merge(['product_to_date' => $product_to_Date]);
+                // $request->merge(['body' => $request->body]);
+                // $request->merge(['tab_section' => $request->has('tab_section')]);
+                // $product = Product::create($request->all());
+
+                // foreach ($request->tab_title as $key => $value) {
+
+                //     $product_tab = new ProductTab();
+                //     $product_tab->product_id = $product->id;
+                //     $product_tab->tab_title = $request->tab_title[$key];
+                //     $product_tab->tab_image = $request->tab_image[$key];
+                //     $product_tab->tab_body = $request->tab_body[$key];
+                //     $product_tab->user_id = auth()->id();
+                //     $product_tab->save();
+                // }
+            } else {
+                $request->merge(['user_id' => auth()->id()]);
+                $request->merge(['active' => $request->has('active')]);
+                $request->merge(['slug' => Str::slug($request->name)]);
+            
+                $request->merge(['tab_section' => 'N']);
+
+                $product = Product::create($request->all());
+            }
+
+            $result = 'success';
         }
-
-        if (isset($request->tab_section)) {
-            // $request->merge(['user_id' => auth()->id()]);
-            // $request->merge(['active' => $request->has('active')]);
-            // $request->merge(['slug' => Str::slug($request->name)]);           
-            // $request->merge(['product_from_date' => $product_from_Date]);
-            // $request->merge(['product_to_date' => $product_to_Date]);
-            // $request->merge(['body' => $request->body]);
-            // $request->merge(['tab_section' => $request->has('tab_section')]);
-            // $product = Product::create($request->all());
-
-            // foreach ($request->tab_title as $key => $value) {
-
-            //     $product_tab = new ProductTab();
-            //     $product_tab->product_id = $product->id;
-            //     $product_tab->tab_title = $request->tab_title[$key];
-            //     $product_tab->tab_image = $request->tab_image[$key];
-            //     $product_tab->tab_body = $request->tab_body[$key];
-            //     $product_tab->user_id = auth()->id();
-            //     $product_tab->save();
-            // }
-        } else {
-            $request->merge(['user_id' => auth()->id()]);
-            $request->merge(['active' => $request->has('active')]);
-            $request->merge(['slug' => Str::slug($request->name)]);
-           
-            $request->merge(['tab_section' => 'N']);
-
-            $product = Product::create($request->all());
-        }
-
-      
-        $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('products.index'))->with('Product-ok', __('The Product has been successfully created'));
+            return redirect(route('products.index'))->with('post-ok', __('The Product has been successfully created'));
         } else {
-            return redirect(route('products.index'))->with('Product-danger', __('The Product already exist'));
+            return redirect(route('products.index'))->with('post-danger', __('The Product already exist'));
         }
     }
 
@@ -393,9 +396,9 @@ class ProductController extends Controller
         $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('products.index'))->with('Product-ok', __('The Product has been successfully updated'));
+            return redirect(route('products.index'))->with('post-ok', __('The Product has been successfully updated'));
         } else {
-            return redirect(route('products.index'))->with('Product-danger', __('The Product already exist. Cannot update'));
+            return redirect(route('products.index'))->with('post-danger', __('The Product already exist. Cannot update'));
         }
     }
 
@@ -416,7 +419,7 @@ class ProductController extends Controller
         //ProductTab::where('product_id', $product->id)->delete();
 
         // return response()->json();
-	return redirect(route('products.index'))->with('Product-ok', __('The Product deleted successfully'));
+	return redirect(route('products.index'))->with('post-ok', __('The Product deleted successfully'));
     }
 
     public function deleteProductTabSection(Request $request)

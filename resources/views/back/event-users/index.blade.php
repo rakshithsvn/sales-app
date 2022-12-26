@@ -45,7 +45,7 @@
                     <strong>@lang('Status') :</strong> &nbsp;
                     <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
                     <input type="checkbox" name="valid"> @lang('Valid')&nbsp;
-		    <input type="checkbox" name="confirmed"> @lang('Confirmed') -->
+		            <input type="checkbox" name="confirmed"> @lang('Confirmed') -->
                     <input type="text" class="pull-right" id="searchContent" placeholder="Search by Name">
 		    <div id="spinner" class="text-center"></div>
                 </div>
@@ -61,7 +61,7 @@
                             <th>@lang('Lab Name')</th>
                             <th>@lang('Verified')</th>
                             <th>@lang('Creation')</th>
-                            <th width="20%">@lang('Action')</th>
+                            <th>@lang('Action')</th>
                         </tr>
                         </thead>
                       {{--  <tfoot>

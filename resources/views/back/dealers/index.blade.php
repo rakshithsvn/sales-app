@@ -21,6 +21,23 @@
 
 <div class="row">
     <div class="col-md-12">
+        @if (session('post-ok'))
+        @component('back.components.alert')
+        @slot('type')
+        success
+        @endslot
+        {!! session('post-ok') !!}
+        @endcomponent
+        @endif
+
+        @if (session('post-danger'))
+        @component('back.components.alert')
+        @slot('type')
+        danger
+        @endslot
+        {!! session('post-danger') !!}
+        @endcomponent
+        @endif
         <div class="box">
             <div class="box-header with-border">
                 <!-- <strong>@lang('Status') :</strong> &nbsp;
@@ -59,24 +76,6 @@
                         </tr>
                     </tfoot>--}}
                     <tbody id="pannel">
-                        @if (session('post-ok'))
-                        @component('back.components.alert')
-                        @slot('type')
-                        success
-                        @endslot
-                        {!! session('post-ok') !!}
-                        @endcomponent
-                        @endif
-
-                        @if (session('post-danger'))
-                        @component('back.components.alert')
-                        @slot('type')
-                        danger
-                        @endslot
-                        {!! session('post-danger') !!}
-                        @endcomponent
-                        @endif
-
                         @include('back.dealers.table', compact('dealers'))
                     </tbody>
                 </table>

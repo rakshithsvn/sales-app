@@ -306,11 +306,7 @@ desired effect
                 'command' => 'list',
                 'color' => 'blue',
               ],
-              [
-                'route' => route('users.index', ['new' => 'on']),
-                'command' => 'new',
-                'color' => 'yellow',
-              ],
+            
               [
                 'route' => route('users.create'),
                 'command' => 'create',

@@ -18,14 +18,31 @@
 
 <div class="row">
     <div class="col-md-12">
+        @if (session('post-ok'))
+        @component('back.components.alert')
+        @slot('type')
+        success
+        @endslot
+        {!! session('post-ok') !!}
+        @endcomponent
+        @endif
+
+        @if (session('post-danger'))
+        @component('back.components.alert')
+        @slot('type')
+        danger
+        @endslot
+        {!! session('post-danger') !!}
+        @endcomponent
+        @endif
         <div class="box">
-            <!-- <div class="box-header with-border">
-                <strong>@lang('Status') :</strong> &nbsp;
+            <div class="box-header with-border">
+                <!-- <strong>@lang('Status') :</strong> &nbsp;
                 <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
-                <input type="checkbox" name="active" @if(request()->active) checked @endif> @lang('Active')&nbsp;
-                <input type="text" class="pull-right" id="searchContent">
+                <input type="checkbox" name="active" @if(request()->active) checked @endif> @lang('Active')&nbsp; -->
+                <input type="text" class="pull-right" id="searchContent" placeholder="Search by Name">
                 <div id="spinner" class="text-center"></div>
-            </div> -->
+            </div>
             <div class="box-body table-responsive">
                 <table id="users" class="table table-striped table-bordered">
                     <thead>
@@ -53,24 +70,6 @@
                         </tr>
                     </tfoot>--}}
                     <tbody id="pannel">
-                        @if (session('post-ok'))
-                        @component('back.components.alert')
-                        @slot('type')
-                        success
-                        @endslot
-                        {!! session('post-ok') !!}
-                        @endcomponent
-                        @endif
-
-                        @if (session('post-danger'))
-                        @component('back.components.alert')
-                        @slot('type')
-                        danger
-                        @endslot
-                        {!! session('post-danger') !!}
-                        @endcomponent
-                        @endif
-
                         @include('back.help_messages.table', compact('help_messages'))
                     </tbody>
                 </table>

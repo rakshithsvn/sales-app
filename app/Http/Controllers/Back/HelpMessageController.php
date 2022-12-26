@@ -203,9 +203,9 @@ class HelpMessageController extends Controller
         $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('help-messages.index'))->with('HelpMessage-ok', __('The HelpMessage has been successfully created'));
+            return redirect(route('help-messages.index'))->with('post-ok', __('The HelpMessage has been successfully created'));
         } else {
-            return redirect(route('help-messages.index'))->with('HelpMessage-danger', __('The HelpMessage already exist'));
+            return redirect(route('help-messages.index'))->with('post-danger', __('The HelpMessage already exist'));
         }
     }
 
@@ -406,9 +406,9 @@ class HelpMessageController extends Controller
         $result = 'success';
 
         if ($result == 'success') {
-            return redirect(route('help-messages.index'))->with('HelpMessage-ok', __('The HelpMessage has been successfully updated'));
+            return redirect(route('help-messages.index'))->with('post-ok', __('The HelpMessage has been successfully updated'));
         } else {
-            return redirect(route('help-messages.index'))->with('HelpMessage-danger', __('The HelpMessage already exist. Cannot update'));
+            return redirect(route('help-messages.index'))->with('post-danger', __('The HelpMessage already exist. Cannot update'));
         }
     }
 
@@ -427,7 +427,7 @@ class HelpMessageController extends Controller
        	$help = HelpMessage::where('id', $id)->delete();
 
         // return response()->json();
-        return redirect(route('help-messages.index'))->with('help-ok', __('The Message deleted successfully'));
+        return redirect(route('help-messages.index'))->with('post-ok', __('The Message deleted successfully'));
     }
 
     public function deleteHelpMessageTabSection(Request $request)
