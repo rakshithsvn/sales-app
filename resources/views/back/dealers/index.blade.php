@@ -12,6 +12,9 @@
 
 @section('button')
 <a href="{{ route('dealers.create') }}" class="btn btn-primary"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New Dealer')</a>
+ {!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}
+{{--        <button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button> --}}    
+</form>
 @endsection
 
 @section('main')
@@ -19,15 +22,15 @@
 <div class="row">
     <div class="col-md-12">
         <div class="box">
-            <!-- <div class="box-header with-border">
-                <strong>@lang('Status') :</strong> &nbsp;
+            <div class="box-header with-border">
+                <!-- <strong>@lang('Status') :</strong> &nbsp;
                 <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
-                <input type="checkbox" name="active" @if(request()->active) checked @endif> @lang('Active')&nbsp;
-                <input type="text" class="pull-right" id="searchContent">
+                <input type="checkbox" name="active" @if(request()->active) checked @endif> @lang('Active')&nbsp; -->
+                <input type="text" class="pull-right" id="searchContent" placeholder="Search by Name">
                 <div id="spinner" class="text-center"></div>
-            </div> -->
+            </div>
             <div class="box-body table-responsive">
-                <table id="users" class="table table-striped table-bordered">
+                <table class="table table-striped table-bordered">
                     <thead>
                         <tr>
                             <th>@lang('Name')<span id="title" class="fa fa-sort pull-right" aria-hidden="true"></span></th>
@@ -80,7 +83,7 @@
             </div>
             <!-- /.box-body -->
             <div class="pull-right">
-                {!! $dealers->render() !!}
+               {!! $dealers->render() !!}
             </div>
             {{-- <div id="pagination" class="box-footer">
                 {{ $links }}

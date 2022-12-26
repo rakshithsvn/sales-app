@@ -45,8 +45,9 @@
                     <strong>@lang('Status') :</strong> &nbsp;
                     <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
                     <input type="checkbox" name="valid"> @lang('Valid')&nbsp;
-                    <input type="checkbox" name="confirmed"> @lang('Confirmed')
-                    <div id="spinner" class="text-center"></div> -->
+		    <input type="checkbox" name="confirmed"> @lang('Confirmed') -->
+                    <input type="text" class="pull-right" id="searchContent" placeholder="Search by Name">
+		    <div id="spinner" class="text-center"></div>
                 </div>
                 <div class="box-body table-responsive">
                     <table id="users" class="table table-striped table-bordered">
@@ -83,9 +84,12 @@
                     </table>
                 </div>
                 <!-- /.box-body -->
-                <div id="pagination" class="box-footer">
+		 <div class="pull-right">
+                	{!! $event_users->render() !!}
+            	</div>
+                {{-- <div id="pagination" class="box-footer">
                     {{ @$links }}
-                </div>
+                </div> --}}
             </div>
             <!-- /.box -->
         </div>
@@ -124,6 +128,9 @@
                 $('.box-header :radio, .box-header :checkbox').click(function () {
                     back.filters(url, errorAjax)
                 })
+		 $(document).on('keyup', '#searchContent', function (event) {
+                    back.search(url, $(this), errorAjax)
+            	})
             }
 
             return {

@@ -98,8 +98,8 @@ class DealerRepository
 
         if (isset($search)) {
             $result =  $result->when($search, function ($query) use ($search) {
-                $query->where('title', 'like', "%" . $search . "%")
-                    ->orWhere('excerpt', 'like', "%" . $search . "%");
+                $query->where('name', 'like', "%" . $search . "%");
+                    //->orWhere('excerpt', 'like', "%" . $search . "%");
             });
         }
         return $result->paginate($nbrPages);
@@ -211,7 +211,7 @@ class DealerRepository
             ->where(function ($q) use ($search) {
                 $q->where('excerpt', 'like', "%$search%")
                     ->orWhere('body', 'like', "%$search%")
-                    ->orWhere('title', 'like', "%$search%");
+                    ->orWhere('name', 'like', "%$search%");
             })->paginate($n);
     }
 

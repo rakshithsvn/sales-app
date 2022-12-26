@@ -68,7 +68,7 @@ error
         <span class="label-input100">Password</span>
     </div>
 
-    <div class="form-group set-max-iframe-height col-md-12 mb-4">
+    <div class="form-group set-max-iframe-height col-md-12 mt-4 mb-2">
         <div class="g-recaptcha" data-sitekey="{{ config('app.site_key') }}"></div>
     </div>
 
