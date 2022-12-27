@@ -12,7 +12,10 @@ use App\{
     Models\LinkUser,
     Repositories\EventUserRepository
 };
+use App\Exports\PurchaseExport;
 use DB;
+use Excel;
+use Carbon\Carbon;
 
 class EventUserController extends Controller
 {
@@ -173,6 +176,77 @@ class EventUserController extends Controller
         $event_user->delete();
 
         return response()->json();
+    }
+
+    public function getExportUserReport (Request $request)
+    {
+        //dd($request->all());
+
+        if(!empty($request->from_date) && !empty($request->to_date))
+        {
+            $from_date = $request->from_date . ' ' . '01:00:00';
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = EventUser::where('created_at','>=',$from_dates)->where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->from_date)){
+
+            $from_date = $request->from_date . ' ' . '01:00:00';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+
+            $report_details = EventUser::where('created_at','>=',$from_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->to_date)){
+
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = EventUser::where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else
+        {
+            $report_details = EventUser::orderBy('id','desc')->get();
+        }
+
+        $dataHeader = array('SL No.','Name','Email','Mobile','Address','District','State','Pin Code','Lab Name','Register Date');
+
+        set_time_limit(0);
+
+        $data = array();
+
+        $user_details = array();
+        $i = 0;
+
+        foreach ($report_details as $report_key => $report_value) {
+            $user_details[$i][] = $report_key+1;
+            $user_details[$i][] = $report_value->name;
+            $user_details[$i][] = $report_value->email;
+            $user_details[$i][] = $report_value->mobile_number;
+            $user_details[$i][] = $report_value->address;
+            $user_details[$i][] = $report_value->district;
+            $user_details[$i][] = $report_value->state;
+            $user_details[$i][] = $report_value->state;
+            $user_details[$i][] = $report_value->lab_name;
+            $user_details[$i][] = $report_value->created_at->format('d/m/Y');
+
+            $i++;
+        }
+        //dd($user_details, $dataHeader);
+        $export = new PurchaseExport($user_details, $dataHeader);  
+        return Excel::download($export, 'user_report.xlsx');
+
+        return view('back.event-users.index');
     }
 
     public function userVerify(Request $request)

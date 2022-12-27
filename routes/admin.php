@@ -48,16 +48,19 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
     Route::get('event-users-change-password/{event_user}', [EventUserController::class, 'changePassword'])->name('event-users.changepassword');
     Route::post('event-users-save-password', [EventUserController::class, 'saveChangePassword'])->name('event_users.storepassword');
     Route::post('event-users-verify', [EventUserController::class, 'userVerify'])->name('event_users.verify');
+    Route::post('export-user', [EventUserController::class, 'getExportUserReport'])->name('export-user');
 
     // Products
     Route::resource('products', 'ProductController', ['except' => 'show']);
     Route::name('product-photos.remove')->post('product-photos/removePhoto', 'ProductController@removeGalleryPhoto');
     Route::get('product.destroy/{product_id}', [ProductController::class, 'destroy'])->name('product.destroy');
+    Route::post('export-product', [ProductController::class, 'getExportProductReport'])->name('export-product');
 
      // Dealers
     Route::resource('dealers', 'DealerController');
     Route::name('dealer-photos.remove')->post('dealer-photos/removePhoto', 'DealerController@removeGalleryPhoto');
     Route::get('dealer.destroy/{dealer_id}', [DealerController::class, 'destroy'])->name('dealer.destroy');
+    Route::post('export-dealer', [DealerController::class, 'getExportDealerReport'])->name('export-dealer');
 
     // Helps
     Route::resource('help-messages', 'HelpMessageController');

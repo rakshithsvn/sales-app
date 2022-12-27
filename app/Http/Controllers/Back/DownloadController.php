@@ -18,6 +18,7 @@ use App\{
   Models\FacultyDetail,
   Models\UserPurchase,
 };
+use App\Exports\PurchaseExport;
 use DataTables;
 use DB;
 use Excel;
@@ -208,71 +209,71 @@ class DownloadController extends Controller
   }
 
   public function getExportGraduationReport(Request $request)
-  {
-    //dd($request->all());
+ {
+       //dd($request->all());
 
-    if (!empty($request->from_date) && !empty($request->to_date)) {
-      $from_date = $request->from_date . ' ' . '01:00:00';
-      $to_date = $request->to_date . ' ' . '23:59:59';
+      if(!empty($request->from_date) && !empty($request->to_date))
+      {
+        $from_date = $request->from_date . ' ' . '01:00:00';
+        $to_date = $request->to_date . ' ' . '23:59:59';
 
-      $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
-      $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+        $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+        $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
 
-      $student_details = UserPurchase::where('created_at', '>=', $from_dates)->where('created_at', '<=', $to_dates)->whereNull('deleted_at')->orderBy('id', 'desc')->get();
-    } else if (!empty($request->from_date)) {
+        $report_details = UserPurchase::where('created_at','>=',$from_dates)->where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
 
-      $from_date = $request->from_date . ' ' . '01:00:00';
+      }
 
-      $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+      else if(!empty($request->from_date)){
 
-      $student_details = UserPurchase::where('created_at', '>=', $from_dates)->whereNull('deleted_at')->orderBy('id', 'desc')->get();
-    } else if (!empty($request->to_date)) {
+        $from_date = $request->from_date . ' ' . '01:00:00';
 
-      $to_date = $request->to_date . ' ' . '23:59:59';
+        $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
 
-      $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+        $report_details = UserPurchase::where('created_at','>=',$from_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
 
-      $student_details = UserPurchase::where('created_at', '<=', $to_dates)->whereNull('deleted_at')->orderBy('id', 'desc')->get();
-    } else {
-      $student_details = UserPurchase::orderBy('id', 'desc')->get();
-    }
+      }
 
-    $dataHeader = array('Name', 'Contact No', 'Email');
+      else if(!empty($request->to_date)){
 
-    set_time_limit(0);
+        $to_date = $request->to_date . ' ' . '23:59:59';
 
-    $data = array();
+        $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
 
-    $student_report_details = array();
-    $i = 0;
+        $report_details = UserPurchase::where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
 
-    foreach ($student_details as $student_report_key => $student_report_value) {
+      }
 
-      $student_report_details[$i][] = $student_report_value->name;
-      $student_report_details[$i][] = $student_report_value->mobile;
-      $student_report_details[$i][] = $student_report_value->email;
-      $i++;
-    }
+      else
+      {
+        $report_details = UserPurchase::orderBy('id','desc')->get();
+      }
 
+      $dataHeader = array('SL No.','User Name','Product Name','Quantity','Dealer Name','Purchase Date');
 
-    return Excel::create('User Purchases', function ($excel) use ($data, $student_report_details, $dataHeader) {
+      set_time_limit(0);
 
-      $excel->sheet('Sheetname', function ($sheet) use ($data, $student_report_details, $dataHeader) {
+      $data = array();
 
-        $sheet->setColumnFormat(array(
-          'S' => '0',
-          'T' => '0',
-        ));
+      $purchase_details = array();
+      $i = 0;
 
-        $sheet->row(1, $dataHeader);
+      foreach ($report_details as $report_key => $report_value) {
+        $purchase_details[$i][] = $report_key+1;
+        $purchase_details[$i][] = $report_value->user->name;
+        $purchase_details[$i][] = $report_value->product->name;
+        $purchase_details[$i][] = $report_value->quantity;
+        $purchase_details[$i][] = $report_value->dealer->name;
+        $purchase_details[$i][] = $report_value->created_at->format('d/m/Y');
 
-        // Append multiple rows
-        $sheet->rows($student_report_details);
-      });
-    })->export('xls');
+        $i++;
+      }
+      //dd($purchase_details, $dataHeader);
+      $export = new PurchaseExport($purchase_details, $dataHeader);  
+      return Excel::download($export, 'purchase_report.xlsx');
 
-    return view('back.downloads.graduation-index');
-  }
+      return view('back.downloads.graduation-index');
+ }
 
   public function deleteGraduationForm(UserPurchase $destroy_id)
   {
@@ -289,7 +290,7 @@ class DownloadController extends Controller
     if ($request->clear) {
       $request->merge(['from_date' => '', 'to_date' => '', 'post_id' => '', 'faculty_id' => '', 'type' => '', 'status' => '']);
     }
-    $registered_forms = GraduationRegister::query();
+    $registered_forms = UserPurchase::query();
 
     if (!empty($_GET["from_date"]) && !empty($_GET["to_date"])) {
       $from_date = $_GET["from_date"] . ' ' . '00:00:00';

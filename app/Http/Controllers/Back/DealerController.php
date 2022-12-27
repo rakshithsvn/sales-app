@@ -18,9 +18,11 @@ use App\{
 
     Repositories\DealerRepository
 };
+use App\Exports\PurchaseExport;
+use DB;
+use Excel;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use DB;
 use Hash;
 
 class DealerController extends Controller
@@ -435,6 +437,73 @@ class DealerController extends Controller
 	// return response()->json();
 	return redirect(route('dealers.index'))->with('post-ok', __('The Dealer deleted successfully'));
     }
+
+     public function getExportDealerReport (Request $request)
+    {
+        //dd($request->all());
+
+        if(!empty($request->from_date) && !empty($request->to_date))
+        {
+            $from_date = $request->from_date . ' ' . '01:00:00';
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = Dealer::where('created_at','>=',$from_dates)->where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->from_date)){
+
+            $from_date = $request->from_date . ' ' . '01:00:00';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+
+            $report_details = Dealer::where('created_at','>=',$from_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->to_date)){
+
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = Dealer::where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else
+        {
+            $report_details = Dealer::orderBy('id','desc')->get();
+        }
+
+        $dataHeader = array('SL No.','Name','Mobile Number','Address','Created By','Creation Date');
+
+        set_time_limit(0);
+
+        $data = array();
+
+        $dealer_details = array();
+        $i = 0;
+
+        foreach ($report_details as $report_key => $report_value) {
+            $dealer_details[$i][] = $report_key+1;
+            $dealer_details[$i][] = $report_value->name;
+            $dealer_details[$i][] = $report_value->mobile_number;
+            $dealer_details[$i][] = $report_value->address;
+            $dealer_details[$i][] = @$report_value->eventUser->name ? @$report_value->eventUser->name : 'Admin';
+            $dealer_details[$i][] = $report_value->created_at->format('d/m/Y');
+            $i++;
+        }
+        //dd($dealer_details, $dataHeader);
+        $export = new PurchaseExport($dealer_details, $dataHeader);  
+        return Excel::download($export, 'dealer_report.xlsx');
+
+        return view('back.dealers.index');
+    }
+
 
     public function deleteDealerTabSection(Request $request)
     {

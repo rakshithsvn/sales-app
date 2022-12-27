@@ -18,9 +18,11 @@ use App\{
 
     Repositories\ProductRepository
 };
+use App\Exports\PurchaseExport;
+use DB;
+use Excel;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use DB;
 use Hash;
 
 class ProductController extends Controller
@@ -421,6 +423,73 @@ class ProductController extends Controller
         // return response()->json();
 	return redirect(route('products.index'))->with('post-ok', __('The Product deleted successfully'));
     }
+
+    public function getExportProductReport (Request $request)
+    {
+        //dd($request->all());
+
+        if(!empty($request->from_date) && !empty($request->to_date))
+        {
+            $from_date = $request->from_date . ' ' . '01:00:00';
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = Product::where('created_at','>=',$from_dates)->where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->from_date)){
+
+            $from_date = $request->from_date . ' ' . '01:00:00';
+
+            $from_dates = Carbon::createFromFormat('d/m/Y H:i:s', $from_date)->format('Y-m-d H:i:s');
+
+            $report_details = Product::where('created_at','>=',$from_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else if(!empty($request->to_date)){
+
+            $to_date = $request->to_date . ' ' . '23:59:59';
+
+            $to_dates = Carbon::createFromFormat('d/m/Y H:i:s', $to_date)->format('Y-m-d H:i:s');
+
+            $report_details = Product::where('created_at','<=',$to_dates)->whereNull('deleted_at')->orderBy('id','desc')->get();
+
+        }
+
+        else
+        {
+            $report_details = Product::orderBy('id','desc')->get();
+        }
+
+        $dataHeader = array('SL No.','Name','Unit Price','Min Order Qty','Reward Points','Creation Date');
+
+        set_time_limit(0);
+
+        $data = array();
+
+        $product_details = array();
+        $i = 0;
+
+        foreach ($report_details as $report_key => $report_value) {
+            $product_details[$i][] = $report_key+1;
+            $product_details[$i][] = $report_value->name;
+            $product_details[$i][] = $report_value->price;
+            $product_details[$i][] = $report_value->min_purchase_qty;
+            $product_details[$i][] = $report_value->reward_points;
+            $product_details[$i][] = $report_value->created_at->format('d/m/Y');
+            $i++;
+        }
+        //dd($product_details, $dataHeader);
+        $export = new PurchaseExport($product_details, $dataHeader);  
+        return Excel::download($export, 'product_report.xlsx');
+
+        return view('back.products.index');
+    }
+    
 
     public function deleteProductTabSection(Request $request)
     {

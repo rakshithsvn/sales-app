@@ -41,7 +41,7 @@
             </div>
 
             <div class="col-md-3 ">
-               <button class="btn btn-success mt-4" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button>
+               <button class="btn btn-success mt-4" type="submit" id="exportData" ><span class="fa fa-file-excel-o"></span> Export</button>
            </div>
         </div>
 

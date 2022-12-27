@@ -13,8 +13,8 @@
 
 @section('button')
 <a href="{{ route('products.create') }}" class="btn btn-primary"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New Product')</a>&nbsp;
-{!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}               
-<button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button>  
+{!! Form::open(array('route' => 'export-product','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}               
+<button class="btn btn-success" type="submit" id="exportData" ><span class="fa fa-file-excel-o"></span> Export</button>  
 </form>
 @endsection
 

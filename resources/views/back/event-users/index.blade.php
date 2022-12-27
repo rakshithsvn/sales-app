@@ -12,8 +12,8 @@
 
 @section('button')
     <a class="btn btn-primary" href="{{ route('event-users.create') }}"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New User')</a>&nbsp;
-    {!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}               
-	 <button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button> 
+    {!! Form::open(array('route' => 'export-user','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}               
+	 <button class="btn btn-success" type="submit" id="exportData" ><span class="fa fa-file-excel-o"></span> Export</button> 
 </form>
 @endsection
 
