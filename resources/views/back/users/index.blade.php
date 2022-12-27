@@ -34,7 +34,7 @@
                     <input type="radio" name="role" value="redac"> @lang('Redactor')&nbsp;
                    {{-- <input type="radio" name="role" value="user"> @lang('User')&nbsp;--}}<br>
                     <strong>@lang('Status') :</strong> &nbsp;
-                    <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp;
+                    {{-- <input type="checkbox" name="new" @if(request()->new) checked @endif> @lang('New')&nbsp; --}}
                     <input type="checkbox" name="valid"> @lang('Valid')&nbsp;
                     <input type="checkbox" name="confirmed"> @lang('Confirmed')
                     <div id="spinner" class="text-center"></div>

@@ -7,13 +7,14 @@
     th span {
         cursor: pointer;
     }
+    .loadingForm {display:contents }
 </style>
 @endsection
 
 @section('button')
 <a href="{{ route('dealers.create') }}" class="btn btn-primary"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New Dealer')</a>
  {!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}
-{{--        <button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button> --}}    
+  <button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button>
 </form>
 @endsection
 
@@ -79,15 +80,15 @@
                         @include('back.dealers.table', compact('dealers'))
                     </tbody>
                 </table>
-            </div>
-            <!-- /.box-body -->
-            <div class="pull-right">
-               {!! $dealers->render() !!}
-            </div>
-            {{-- <div id="pagination" class="box-footer">
+            
+            	<div class="pull-right">
+               		{!! $dealers->render() !!}
+		</div>
+            	{{-- <div id="pagination" class="box-footer">
                 {{ $links }}
-        </div> --}}
-    </div>
+	        </div> --}}
+    	</div>
+   </div>
     <!-- /.box -->
 </div>
 <!-- /.col -->

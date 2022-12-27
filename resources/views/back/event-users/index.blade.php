@@ -6,11 +6,15 @@
         input, th span {
             cursor: pointer;
         }
+	.loadingForm { display: contents }
     </style>
 @endsection
 
 @section('button')
-    <a class="btn btn-primary" href="{{ route('event-users.create') }}"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New User')</a>
+    <a class="btn btn-primary" href="{{ route('event-users.create') }}"><span class="fa fa-plus" aria-hidden="true"></span> @lang('New User')</a>&nbsp;
+    {!! Form::open(array('route' => 'prospects.graduation-download','class'=>'form-horizontal loadingForm','method'=>'post','id'=>'exportData','name'=>'exportData')) !!}               
+	 <button class="btn btn-success" type="submit" id="exportData" ><i class="fa fa-file-excel-o"></i> Download</button> 
+</form>
 @endsection
 
 @section('main')
@@ -61,7 +65,7 @@
                             <th>@lang('Lab Name')</th>
                             <th>@lang('Verified')</th>
                             <th>@lang('Creation')</th>
-                            <th>@lang('Action')</th>
+                            <th width="15%">@lang('Action')</th>
                         </tr>
                         </thead>
                       {{--  <tfoot>
@@ -82,14 +86,13 @@
                             @include('back.event-users.table', compact('event_users'))
                         </tbody>
                     </table>
-                </div>
-                <!-- /.box-body -->
-		 <div class="pull-right">
+                    <div class="pull-right">
                 	{!! $event_users->render() !!}
-            	</div>
-                {{-- <div id="pagination" class="box-footer">
-                    {{ @$links }}
-                </div> --}}
+            	    </div>
+                    {{-- <div id="pagination" class="box-footer">
+                       {{ @$links }}
+                    </div> --}}
+		</div>
             </div>
             <!-- /.box -->
         </div>
