@@ -16,10 +16,11 @@ use App\{
     Models\LinkFaculty,
     Models\Notification,
     Models\Product,
-    Models\Dealer
+    Models\Dealer,
+    Models\HelpMessage,
+    Models\UserPurchase,
 };
-use App\Models\HelpMessage;
-use App\Models\UserPurchase;
+
 use \App\Repositories\EventUserRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
@@ -410,7 +411,7 @@ class APIController extends Controller
 
     public function addPurchaseEntry(Request $request)
     {
-        $request->replace(['user_id' => $request->user_id, 'product_id' => $request->product_id, 'dealer_id' => $request->dealer_id, 'quantity' => $request->quantity, 'invoice_url' => $request->invoice_url]);
+        $request->replace(['user_id' => $request->user_id, 'product_id' => $request->product_id, 'dealer_id' => $request->dealer_id, 'quantity' => $request->quantity, 'invoice_url' => $request->invoice_url, 'status' => 'PENDING']);
 
         $res = UserPurchase::insertGetId($request->all());
 

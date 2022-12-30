@@ -76,6 +76,8 @@ Route::prefix('admin')->middleware(['auth'])->namespace('App\Http\Controllers\Ba
 
     Route::post('export-graduation', [DownloadController::class, 'getExportGraduationReport'])->name('prospects.graduation-download');
 
+    Route::post('purchase-status', [DownloadController::class, 'updatePurchaseStatus'])->name('purchase-status');
+
     Route::delete('graduation.destroy/{destroy_id}', [DownloadController::class, 'deleteGraduationForm'])->name('graduation.destroy');
 
 

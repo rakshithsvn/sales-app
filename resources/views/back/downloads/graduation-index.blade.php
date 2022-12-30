@@ -10,6 +10,13 @@
     input, th span {
         cursor: pointer;
     }
+    form { display: inline-flex }
+    .btn { padding: 4px 10px }
+    .btn.btn-status {
+        padding: 2px;
+	border-radius: 15px;
+	font-weight: 600;
+    }
 </style>
 @endsection
 
@@ -17,6 +24,22 @@
 
 <div class="row">
     <div class="col-md-12">
+	 @if (session('post-ok'))
+         @component('back.components.alert')
+         @slot('type')
+         success
+         @endslot
+         {!! session('post-ok') !!}
+         @endcomponent
+         @endif
+         @if (session('post-danger'))
+         @component('back.components.alert')
+         @slot('type')
+         danger
+         @endslot
+         {!! session('post-danger') !!}
+         @endcomponent
+         @endif
         <div class="box">
             <div class="box-header with-border">             
              
@@ -60,10 +83,10 @@
                 <th>@lang('Product')</th>
                 <th>@lang('Quantity')</th>
                 <th>@lang('Dealer')</th>
-                <th>@lang('Verified')</th>
+                <th>@lang('Status')</th>
                 <th>@lang('Purchase Date')</th>
                 <th>@lang('Invoice')</th>
-                <th style="text-align: center">@lang('Action')</th>
+                <th style="text-align: center; width: 16%">@lang('Action')</th>
             </tr>
         </thead>
         
@@ -76,7 +99,6 @@
     {!! $registered_forms->render() !!}
 </div>
 </div>
-
         
 
     </div>

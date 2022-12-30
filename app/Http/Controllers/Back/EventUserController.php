@@ -219,7 +219,7 @@ class EventUserController extends Controller
             $report_details = EventUser::orderBy('id','desc')->get();
         }
 
-        $dataHeader = array('SL No.','Name','Email','Mobile','Address','District','State','Pin Code','Lab Name','Register Date');
+        $dataHeader = array('SL No.','Name','Email','Mobile','Address','District','State','Pin Code','Lab Name','Verified','Register Date');
 
         set_time_limit(0);
 
@@ -238,6 +238,7 @@ class EventUserController extends Controller
             $user_details[$i][] = $report_value->state;
             $user_details[$i][] = $report_value->state;
             $user_details[$i][] = $report_value->lab_name;
+	    $user_details[$i][] = @$report_value->is_verified ? 'Yes':'No';
             $user_details[$i][] = $report_value->created_at->format('d/m/Y');
 
             $i++;

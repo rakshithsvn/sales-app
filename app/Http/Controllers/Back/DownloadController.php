@@ -177,7 +177,7 @@ class DownloadController extends Controller
     return response()->json();
   }
 
-  // Alumni Register
+  // Purchase Report
 
   public function viewGraduationRegister(Request $request)
   {
@@ -249,7 +249,7 @@ class DownloadController extends Controller
         $report_details = UserPurchase::orderBy('id','desc')->get();
       }
 
-      $dataHeader = array('SL No.','User Name','Product Name','Quantity','Dealer Name','Purchase Date');
+      $dataHeader = array('SL No.','User Name','Product Name','Quantity','Dealer Name','Status','Purchase Date');
 
       set_time_limit(0);
 
@@ -260,10 +260,11 @@ class DownloadController extends Controller
 
       foreach ($report_details as $report_key => $report_value) {
         $purchase_details[$i][] = $report_key+1;
-        $purchase_details[$i][] = $report_value->user->name;
-        $purchase_details[$i][] = $report_value->product->name;
+        $purchase_details[$i][] = @$report_value->user->name;
+        $purchase_details[$i][] = @$report_value->product->name;
         $purchase_details[$i][] = $report_value->quantity;
-        $purchase_details[$i][] = $report_value->dealer->name;
+        $purchase_details[$i][] = @$report_value->dealer->name;
+        $purchase_details[$i][] = @$report_value->status;
         $purchase_details[$i][] = $report_value->created_at->format('d/m/Y');
 
         $i++;
@@ -280,6 +281,21 @@ class DownloadController extends Controller
     // dd($destroy_id);
     $destroy_id->delete();
     return response()->json();
+  }
+
+  public function updatePurchaseStatus(Request $request) 
+  {
+    //dd($request->all());
+    $purchase = UserPurchase::find($request->id);
+    $purchase->status = $request->status == '1' ? 'APPROVED' : 'REJECTED';
+    $purchase->updated_by = auth()->id();
+    $purchase->update();
+
+    $reward = DB::table('user_rewards')->where('user_id', $purchase->user_id);
+    $reward->update(array('user_reward' => 0));
+
+    return redirect(route('prospects.graduation-index'))->with('post-ok', __('The purchase detail has been successfully updated'));
+
   }
 
 

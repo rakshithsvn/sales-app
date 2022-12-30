@@ -6,6 +6,12 @@
         input, th span {
             cursor: pointer;
         }
+	.btn.btn-status { 
+	    width: 20%;
+            padding: 2px;
+            border-radius: 15px;
+            font-weight: 600;
+        }
     </style>
 @endsection
 
@@ -44,7 +50,15 @@
        <tr>
             <th>Invoice File</th>
             <td><a href="{{@$graduation_details->invoice_url}}" target="_blank"><i class="fa fa-download" title="Click to download" aria-hidden="true"></i></a></td>  
-        </tr> 
+        </tr>
+	<tr>
+	   <th>Status</th>
+	   <td>
+	        @if(@$graduation_details->status)
+		<?php $btn_class = @$graduation_details->status == 'APPROVED' ? 'btn-success' : (@$graduation_details->status == 'REJECTED' ? 'btn-danger' : 'btn-primary'); ?>
+		<button class="btn btn-xs btn-block btn-status {{@$btn_class}}" readonly disabled>{{ @$graduation_details->status }}</button>
+		@endif
+	   </td> 
 
         </table>
 
